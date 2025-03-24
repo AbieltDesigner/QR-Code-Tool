@@ -40,9 +40,9 @@
             <Button Style="{StaticResource buttonStyle}" Content="Обновить" Click="refresh_Click" Width="120"/>
             <Button Style="{StaticResource buttonStyle}" Content="Создать один QR" Click="generateQR_Click" Width="120" />
             <Button Style="{StaticResource buttonStyle}" Content="Создать QR всех файлов" Click="generateQR_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="generateQR_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="generateQR_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Click="generateQR_Click" Width="120" />
+            <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="publish_Click" Width="120" />
+            <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="unpublish_Click" Width="120" />
+            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Click="copiLink_Click" Width="120" />
             <Label Content="Расположение папки"/>
         </DockPanel>
 
@@ -52,6 +52,11 @@
     
         <DataGrid Name="gridItems" Grid.Row="1" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" 
                   CanUserAddRows="False" IsReadOnly="True" SelectionChanged="gridItems_SelectionChanged">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"/>
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование" Width="350" Binding="{Binding Path=Name}"/>
                 <DataGridTextColumn Header="Дата" Width="110" Binding="{Binding Path=Modified, StringFormat='dd/MM/yyyy hh:mm'}"/>

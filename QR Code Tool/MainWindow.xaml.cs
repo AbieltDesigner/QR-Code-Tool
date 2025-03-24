@@ -22,6 +22,10 @@ using YandexDisk.Client.Clients;
 using YandexDisk.Client.Http;
 using YandexDisk.Client.Protocol;
 using QR_Code_Tool.API;
+using MessageBox = System.Windows.MessageBox;
+using System.Threading;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 
 namespace QR_Code_Tool
@@ -29,26 +33,38 @@ namespace QR_Code_Tool
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : INotifyPropertyChanged
     {
-        private IDiskSdkClient sdk;
-
-        private LoginWindow loginWindow;
+        //private IDiskSdkClient sdk;
+        //private LoginWindow loginWindow;
         //public static string AccessToken { get; set; } = "y0__xDvjZ2gqveAAhjXpDYggK3YzRI68bMOcTmM_EFbmYxkG9nBI5nVvw"; //Token chepurin@jg-group.ru
         public static string AccessToken { get; set; } = "y0__xDmxJNrGJ6nNiDvsPzOEtX65QtEgHbHV0OEN8ZqY33Ym2t8"; //Token vlad1988.1@yandex.ru (test token)
-
         private string currentPath, previousPath, homePath;
-       
+        public event PropertyChangedEventHandler PropertyChanged;
+        private string returnURL;
+              
+
+        public string ReturnURL
+        {
+            get { return returnURL; }
+            set
+            {
+                returnURL = value;
+                OnPropertyChanged("ReturnURL");
+            }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+            _ = this.InitFolder(this.currentPath);
+        }
+
         public MainWindow()
         {
-            InitializeComponent();   
-            
-            homePath = "Информация для заказчиков и объектов";
-
-            var api = new Metods(AccessToken);
-            
-            _= api.PublishFolderOrFile(homePath + "/Проекты СТ 2024 год/009466(С) - СТ19 ТБ РЖД 2024 ЮВ-Красноярская", "/" + "Паспорт 00001_B24.pdf");
-
+            InitializeComponent();               
+            homePath = "Информация для заказчиков и объектов";         
             _ = InitFolder(homePath);            
         }
 
@@ -58,7 +74,7 @@ namespace QR_Code_Tool
             {
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
                 this.currentPath = path;
-                var api = new Metods(AccessToken);
+                var api = new YandexAPI(AccessToken);
                 var resource = await api.GetListFilesToFolder(currentPath);
                 gridItems.ItemsSource = resource.Embedded.Items;
             }
@@ -93,6 +109,79 @@ namespace QR_Code_Tool
             _ = this.InitFolder(this.currentPath);
         }
 
+        private void publish_Click(object sender, RoutedEventArgs e)
+        {
+            _ = Publish(this.currentPath);           
+        }
+
+        private void unpublish_Click(object sender, RoutedEventArgs e)
+        {
+            _ = UnPublish(this.currentPath);            
+        }
+
+        private async Task Publish(string currentPath)
+        {
+            try
+            {
+                Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
+                if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
+                {
+                    var api = new YandexAPI(AccessToken);                    
+                    var task = await api.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                    ReturnURL = task.Href;                  
+                }
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+        }
+               
+        private async Task UnPublish(string currentPath)
+        {
+            try
+            {
+                Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
+                if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
+                {
+                    var api = new YandexAPI(AccessToken);
+                    var task = await api.UnPublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                    ReturnURL = task.Href;
+                }
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+        }
+
+
+        private void copiLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
+                if (rowDataDisk.PublicUrl == null)
+                {
+                    MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);  
+                }
+                else
+                {
+                    System.Windows.Clipboard.SetText(rowDataDisk.PublicUrl);
+                }                                  
+            }
+
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+
+            catch (ArgumentNullException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+        }
+
         private void login_Click(object sender, RoutedEventArgs e)
         {
             //AccessToken = string.Empty;
@@ -105,22 +194,31 @@ namespace QR_Code_Tool
 
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
+            //if (rowDataDisk.Type is ResourceType.Dir)
+            //{
+            //    previousPath = currentPath;
+            //    currentPath = currentPath + "/" + rowDataDisk.Name;
+            //    _ = InitFolder(currentPath);                
+            //}                  
+        }
+
+        private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            //DataGridRow row = sender as DataGridRow;
             Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
             if (rowDataDisk.Type is ResourceType.Dir)
             {
                 previousPath = currentPath;
                 currentPath = currentPath + "/" + rowDataDisk.Name;
-                _ = InitFolder(currentPath);                
-            }                  
+                _ = InitFolder(currentPath);
+            }
         }
 
         private void generateQR_Click(object sender, RoutedEventArgs e)
         {
 
         }
-
-
-
 
         private void ShowLoginWindow()
         {

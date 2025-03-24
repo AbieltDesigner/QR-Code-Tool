@@ -10,12 +10,12 @@ using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool.API
 {
-    public class Metods
+    public class YandexAPI
     {
         private static string AccessToken { get; set; }
         DiskHttpApi diskHttpApi;
 
-        public Metods(string Token)
+        public YandexAPI(string Token)
         {
             AccessToken = Token;
             diskHttpApi = new DiskHttpApi(AccessToken);
@@ -27,20 +27,20 @@ namespace QR_Code_Tool.API
             return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath });          
         }
 
-        public async Task<Link> GetFileInfo(string folderPath, string filePath)
+        public async Task GetFileInfo(string folderPath, string filePath)
         {          
             string fullPath = $@"disk:/" + $"{folderPath}" + "/" + $"{filePath}";
-            return await diskHttpApi.Files.GetDownloadLinkAsync(fullPath);
+            await diskHttpApi.Files.GetDownloadLinkAsync(fullPath);
         }
 
-        public async Task PublishFolderOrFile(string folderPath, string filePath = default)
+        public async Task<Link> PublishFolderOrFile(string folderPath, string filePath = default)
         {
-            await diskHttpApi.MetaInfo.PublishFolderAsync(folderPath + filePath);         
-        }
-        public async Task UnPublishFolderOrFile(string folderPath, string filePath = default)
-        {
-            await diskHttpApi.MetaInfo.UnpublishFolderAsync(folderPath + filePath);
+            return await diskHttpApi.MetaInfo.PublishFolderAsync(folderPath + filePath);         
         }
 
+        public async Task<Link> UnPublishFolderOrFile(string folderPath, string filePath = default)
+        {
+            return await diskHttpApi.MetaInfo.UnpublishFolderAsync(folderPath + filePath);
+        }
     }
 }
