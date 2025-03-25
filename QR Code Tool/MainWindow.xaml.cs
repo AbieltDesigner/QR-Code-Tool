@@ -33,31 +33,21 @@ namespace QR_Code_Tool
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
         //private IDiskSdkClient sdk;
         //private LoginWindow loginWindow;
         //public static string AccessToken { get; set; } = "y0__xDvjZ2gqveAAhjXpDYggK3YzRI68bMOcTmM_EFbmYxkG9nBI5nVvw"; //Token chepurin@jg-group.ru
         public static string AccessToken { get; set; } = "y0__xDmxJNrGJ6nNiDvsPzOEtX65QtEgHbHV0OEN8ZqY33Ym2t8"; //Token vlad1988.1@yandex.ru (test token)
         private string currentPath, previousPath, homePath;
-        public event PropertyChangedEventHandler PropertyChanged;
-        private string returnURL;
-              
+        public event PropertyChangedEventHandler PropertyChanged;    
+        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
 
-        public string ReturnURL
-        {
-            get { return returnURL; }
-            set
-            {
-                returnURL = value;
-                OnPropertyChanged("ReturnURL");
-            }
-        }
 
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {
             if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));            
             _ = this.InitFolder(this.currentPath);
         }
 
@@ -78,6 +68,7 @@ namespace QR_Code_Tool
                 var resource = await api.GetListFilesToFolder(currentPath);
                 gridItems.ItemsSource = resource.Embedded.Items;
             }
+            LabelDir.Content = currentPath;
         }
 
         private void home_Click(object sender, RoutedEventArgs e)
@@ -123,17 +114,33 @@ namespace QR_Code_Tool
         {
             try
             {
-                Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
-                if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
+                var api = new YandexAPI(AccessToken);
+                var collectionRows = gridItems.SelectedItems;
+
+                for (int i = 0; i < collectionRows.Count; i++)
                 {
-                    var api = new YandexAPI(AccessToken);                    
-                    var task = await api.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
-                    ReturnURL = task.Href;                  
-                }
+                    Resource rowDataDisk = (Resource)collectionRows[i];
+                    if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
+                    {
+                        await semaphoreSlim.WaitAsync();
+                        try
+                        {
+                            await api.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    }                   
+                }                   
             }
             catch (ArgumentOutOfRangeException ex)
             {
                 Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+            finally
+            {
+                _= this.InitFolder(this.currentPath);
             }
         }
                
@@ -141,17 +148,33 @@ namespace QR_Code_Tool
         {
             try
             {
-                Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
-                if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
+                var api = new YandexAPI(AccessToken);
+                var collectionRows = gridItems.SelectedItems;
+
+                for (int i = 0; i < collectionRows.Count; i++)
                 {
-                    var api = new YandexAPI(AccessToken);
-                    var task = await api.UnPublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
-                    ReturnURL = task.Href;
+                    Resource rowDataDisk = (Resource)collectionRows[i];
+                    if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
+                    {
+                        await semaphoreSlim.WaitAsync();
+                        try
+                        {
+                            await api.UnPublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    }
                 }
             }
             catch (ArgumentOutOfRangeException ex)
             {
                 Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+            finally
+            {
+                _ = this.InitFolder(this.currentPath);
             }
         }
 

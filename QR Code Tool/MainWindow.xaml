@@ -25,32 +25,23 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="25"/>
             <RowDefinition/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoggedIn}">
-            <Button Style="{StaticResource buttonStyle}" Content="Домой" Click="home_Click"  Width="90"/>
-            <Button Style="{StaticResource buttonStyle}" Content="Переход вверх" Click="goUp_Click"  Width="90"/>
-            <Button Style="{StaticResource buttonStyle}" Content="Преход назад" Click="back_Click" Width="90"/>                 
+            <Button Style="{StaticResource buttonStyle}" Content="Home" Click="home_Click" />
+            <Button Style="{StaticResource buttonStyle}" Content="Go up" Click="goUp_Click" />
+            <Button Style="{StaticResource buttonStyle}" Content="Go back" Click="back_Click" />                 
             <ProgressBar Name="progressBar" IsIndeterminate="True" Width="550" Height="20" Margin="25,0,0,0" Visibility="Collapsed"/>
         </StackPanel>
 
-        <DockPanel Grid.Row="2" VerticalAlignment="Bottom">
-            <Button Style="{StaticResource buttonStyle}" Content="Обновить" Click="refresh_Click" Width="120"/>
-            <Button Style="{StaticResource buttonStyle}" Content="Создать один QR" Click="generateQR_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Создать QR всех файлов" Click="generateQR_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="publish_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="unpublish_Click" Width="120" />
-            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Click="copiLink_Click" Width="120" />
-            <Label Content="Расположение папки"/>
-        </DockPanel>
+        <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+            <Label Name="LabelDir" Content="Адрес папки"/>
+        </StackPanel>
 
-        <StackPanel VerticalAlignment="Bottom">
-            <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedOut}" HorizontalAlignment="Right" Content="Login" Click="login_Click" />
-        </StackPanel>                
-    
-        <DataGrid Name="gridItems" Grid.Row="1" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" 
+        <DataGrid Name="gridItems" Grid.Row="2" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" 
                   CanUserAddRows="False" IsReadOnly="True" SelectionChanged="gridItems_SelectionChanged">
             <DataGrid.Resources>
                 <Style TargetType="DataGridRow">
@@ -65,8 +56,23 @@
                 <DataGridTextColumn Header="Публичная ссылка" Width="*" Binding="{Binding Path=PublicUrl}" />
             </DataGrid.Columns>
         </DataGrid>
-     
-        <Popup Name="popupNewFolder" StaysOpen="False" Placement="Center" MaxWidth="250" PopupAnimation="Scroll" IsOpen="False">
+
+        <DockPanel Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+            <Button Style="{StaticResource buttonStyle}" Content="Обновить" Click="refresh_Click" Width="110"/>
+            <Button Style="{StaticResource buttonStyle}" Content="Печать QR" Click="generateQR_Click" Width="110" />          
+            <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="publish_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="unpublish_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Click="copiLink_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Загрузить файлы" Click="copiLink_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Удалить файлы" Click="copiLink_Click" Width="110" />
+        </DockPanel>
+
+        <StackPanel Grid.Row="3" VerticalAlignment="Bottom">
+            <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedOut}" HorizontalAlignment="Right" Content="Login" Click="login_Click" />
+        </StackPanel>
+
+
+        <!--<Popup Name="popupNewFolder" StaysOpen="False" Placement="Center" MaxWidth="250" PopupAnimation="Scroll" IsOpen="False">
             <Border Style="{StaticResource popupBorderStyle}">
                 <StackPanel Orientation="Horizontal" Margin="10">
                     <TextBox Name="txtNewFolderName" Text="NewFolder" Width="150"/>                  
@@ -81,7 +87,7 @@
                     <TextBox x:Name="txtLink" Width="250" Height="25" Margin="0,10,0,0"/>
                 </StackPanel>
             </Border>
-        </Popup>
+        </Popup>-->
 
     </Grid>
 </Window>
