@@ -33,8 +33,7 @@
         <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoggedIn}">
             <Button Style="{StaticResource buttonStyle}" Content="Home" Click="home_Click" />
             <Button Style="{StaticResource buttonStyle}" Content="Go up" Click="goUp_Click" />
-            <Button Style="{StaticResource buttonStyle}" Content="Go back" Click="back_Click" />                 
-            <ProgressBar Name="progressBar" IsIndeterminate="True" Width="550" Height="20" Margin="25,0,0,0" Visibility="Collapsed"/>
+            <Button Style="{StaticResource buttonStyle}" Content="Go back" Click="back_Click" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
@@ -49,27 +48,41 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование" Width="350" Binding="{Binding Path=Name}"/>
-                <DataGridTextColumn Header="Дата" Width="110" Binding="{Binding Path=Modified, StringFormat='dd/MM/yyyy hh:mm'}"/>
-                <DataGridTextColumn Header="Размер" Width="110" Binding="{Binding Path=Size, Converter={StaticResource itemSizeConverter}}"/>
-                <DataGridTextColumn Header="Тип" Width="110" Binding="{Binding Path=Type, Converter={StaticResource itemTypeConverter}}"/>
-                <DataGridTextColumn Header="Публичная ссылка" Width="*" Binding="{Binding Path=PublicUrl}" />
+                <DataGridTextColumn Header="Наименование"     Width="350" Binding="{Binding Path=Name}"/>
+                <DataGridTextColumn Header="Дата"             Width="110" Binding="{Binding Path=Modified, StringFormat='dd/MM/yyyy hh:mm'}"/>
+                <DataGridTextColumn Header="Размер"           Width="110" Binding="{Binding Path=Size, Converter={StaticResource itemSizeConverter}}"/>
+                <DataGridTextColumn Header="Тип"              Width="110" Binding="{Binding Path=Type, Converter={StaticResource itemTypeConverter}}"/>
+                <DataGridTextColumn Header="Публичная ссылка" Width="*"   Binding="{Binding Path=PublicUrl}" />
             </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Обновить"          Click="refresh_Click"></MenuItem>
+                    <MenuItem Header="Создать ссылку"    Click="publish_Click"></MenuItem>
+                    <MenuItem Header="Удалить ссылку"    Click="unpublish_Click"></MenuItem>
+                    <MenuItem Header="Копировать ссылку" Click="copiLink_Click"></MenuItem>
+                    <MenuItem Header="Печать QR"         Click="printQR_Click"></MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>           
         </DataGrid>
 
-        <DockPanel Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+        <DockPanel  Grid.Row="3" VerticalAlignment="Bottom" IsEnabled="{Binding IsLoggedIn}" HorizontalAlignment="Left">
             <Button Style="{StaticResource buttonStyle}" Content="Обновить" Click="refresh_Click" Width="110"/>
-            <Button Style="{StaticResource buttonStyle}" Content="Печать QR" Click="generateQR_Click" Width="110" />          
+            <Button Style="{StaticResource buttonStyle}" Content="Печать QR" Click="printQR_Click" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="publish_Click" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="unpublish_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Click="copiLink_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Загрузить файлы" Click="copiLink_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Удалить файлы" Click="copiLink_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку"  Click="copiLink_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Загрузить файлы" Click="upLoadFile_Click" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Удалить файлы" Click="deleteFile_Click" Width="110" />
         </DockPanel>
-
+        
+        <StackPanel Grid.Row="2" VerticalAlignment="Center">
+            <ProgressBar Name="progressBar" IsIndeterminate="True" Width="550" Height="20" Margin="25,0,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+    
         <StackPanel Grid.Row="3" VerticalAlignment="Bottom">
             <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedOut}" HorizontalAlignment="Right" Content="Login" Click="login_Click" />
-        </StackPanel>
+        </StackPanel>  
+        
 
 
         <!--<Popup Name="popupNewFolder" StaysOpen="False" Placement="Center" MaxWidth="250" PopupAnimation="Scroll" IsOpen="False">

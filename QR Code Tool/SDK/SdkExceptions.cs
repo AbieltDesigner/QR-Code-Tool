@@ -2,8 +2,8 @@
  * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
  */
 
-using Disk.SDK.Utils;
 using System;
+using QR_Code_Tool.SDK.Utils;
 
 namespace QR_Code_Tool.SDK
 {

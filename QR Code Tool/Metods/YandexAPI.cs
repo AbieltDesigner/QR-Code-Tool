@@ -1,24 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Threading.Tasks;
+using QR_Code_Tool.Metods;
 using YandexDisk.Client.Http;
 using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool.API
 {
-    public class YandexAPI
+    public class YandexAPI : IYandexAPI
     {
-        private static string AccessToken { get; set; }
+        private readonly string accessToken;
+
         DiskHttpApi diskHttpApi;
 
-        public YandexAPI(string Token)
+        public YandexAPI(string accessToken)
         {
-            AccessToken = Token;
-            diskHttpApi = new DiskHttpApi(AccessToken);
+            this.accessToken = accessToken;
+            diskHttpApi = new DiskHttpApi(accessToken);
+        }
+
+        /// <summary>
+        /// Пользовательский токен
+        /// </summary>
+        /// <value>The access token.</value>
+        public string AccessToken
+        {
+            get { return this.accessToken; }
         }
 
         public async Task<Resource> GetListFilesToFolder(string currentPath)
@@ -42,5 +47,10 @@ namespace QR_Code_Tool.API
         {
             return await diskHttpApi.MetaInfo.UnpublishFolderAsync(folderPath + filePath);
         }
+
+
+
+
+
     }
 }

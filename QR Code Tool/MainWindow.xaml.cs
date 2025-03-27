@@ -1,31 +1,18 @@
-﻿using Gecko;
-using QR_Code_Tool.SDK;
-using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using YandexDisk.Client.Clients;
-using YandexDisk.Client.Http;
-using YandexDisk.Client.Protocol;
 using QR_Code_Tool.API;
+using QR_Code_Tool.Metods;
+using QR_Code_Tool.Properties;
+using QR_Code_Tool.SDK;
+using YandexDisk.Client.Protocol;
 using MessageBox = System.Windows.MessageBox;
-using System.Threading;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 
 namespace QR_Code_Tool
@@ -33,23 +20,13 @@ namespace QR_Code_Tool
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : INotifyPropertyChanged
     {
-        //private IDiskSdkClient sdk;
-        //private LoginWindow loginWindow;
-        //public static string AccessToken { get; set; } = "y0__xDvjZ2gqveAAhjXpDYggK3YzRI68bMOcTmM_EFbmYxkG9nBI5nVvw"; //Token chepurin@jg-group.ru
-        public static string AccessToken { get; set; } = "y0__xDmxJNrGJ6nNiDvsPzOEtX65QtEgHbHV0OEN8ZqY33Ym2t8"; //Token vlad1988.1@yandex.ru (test token)
-        private string currentPath, previousPath, homePath;
-        public event PropertyChangedEventHandler PropertyChanged;    
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
-
-
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));            
-            _ = this.InitFolder(this.currentPath);
-        }
+        private IYandexAPI yandexClient;
+        private LoginWindow loginWindow;        
+        public static string AccessToken { get; set; }
+        private string currentPath, previousPath, homePath;     
+        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);       
 
         public MainWindow()
         {
@@ -61,14 +38,14 @@ namespace QR_Code_Tool
         private async Task InitFolder(string path)
         {
             if (!string.IsNullOrEmpty(AccessToken))
-            {
-                this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
+            {               
                 this.currentPath = path;
                 var api = new YandexAPI(AccessToken);
                 var resource = await api.GetListFilesToFolder(currentPath);
                 gridItems.ItemsSource = resource.Embedded.Items;
-            }
-            LabelDir.Content = currentPath;
+                this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
+                LabelDir.Content = currentPath;
+            }                     
         }
 
         private void home_Click(object sender, RoutedEventArgs e)
@@ -109,14 +86,22 @@ namespace QR_Code_Tool
         {
             _ = UnPublish(this.currentPath);            
         }
+        private void deleteFile_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.MessageBox.Show("Пока не реализовано");
+        }
+        private void upLoadFile_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.MessageBox.Show("Пока не реализовано");
+        }
 
         private async Task Publish(string currentPath)
-        {
+        {           
             try
             {
                 var api = new YandexAPI(AccessToken);
                 var collectionRows = gridItems.SelectedItems;
-
+                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 for (int i = 0; i < collectionRows.Count; i++)
                 {
                     Resource rowDataDisk = (Resource)collectionRows[i];
@@ -124,7 +109,7 @@ namespace QR_Code_Tool
                     {
                         await semaphoreSlim.WaitAsync();
                         try
-                        {
+                        {                           
                             await api.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
                         }
                         finally
@@ -141,7 +126,7 @@ namespace QR_Code_Tool
             finally
             {
                 _= this.InitFolder(this.currentPath);
-            }
+            }            
         }
                
         private async Task UnPublish(string currentPath)
@@ -150,7 +135,7 @@ namespace QR_Code_Tool
             {
                 var api = new YandexAPI(AccessToken);
                 var collectionRows = gridItems.SelectedItems;
-
+                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 for (int i = 0; i < collectionRows.Count; i++)
                 {
                     Resource rowDataDisk = (Resource)collectionRows[i];
@@ -191,6 +176,7 @@ namespace QR_Code_Tool
                 else
                 {
                     System.Windows.Clipboard.SetText(rowDataDisk.PublicUrl);
+                    MessageBox.Show("Ссылка скопирована в буфер обмена.", "Удачно", MessageBoxButton.OK, MessageBoxImage.Information);
                 }                                  
             }
 
@@ -206,24 +192,16 @@ namespace QR_Code_Tool
         }
 
         private void login_Click(object sender, RoutedEventArgs e)
-        {
-            //AccessToken = string.Empty;
-            //this.CreateSdkClient();
-            //this.FolderItems = null;
-            //this.CurrentPath = string.Empty;
-            //this.OnPropertyChanged("IsLoggedIn");
+        {          
+            AccessToken = string.Empty;
+            this.currentPath = string.Empty;
+            this.OnPropertyChanged("IsLoggedIn");
             this.ShowLoginWindow();
         }
 
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
-            //if (rowDataDisk.Type is ResourceType.Dir)
-            //{
-            //    previousPath = currentPath;
-            //    currentPath = currentPath + "/" + rowDataDisk.Name;
-            //    _ = InitFolder(currentPath);                
-            //}                  
+                      
         }
 
         private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
@@ -238,14 +216,16 @@ namespace QR_Code_Tool
             }
         }
 
-        private void generateQR_Click(object sender, RoutedEventArgs e)
+        private void printQR_Click(object sender, RoutedEventArgs e)
         {
-
+            System.Windows.Forms.MessageBox.Show("Пока не реализовано");
         }
 
         private void ShowLoginWindow()
         {
-           
+            this.loginWindow = new LoginWindow(this.yandexClient);
+            this.loginWindow.AuthCompleted += this.OnAuthorizeCompleted;
+            this.loginWindow.ShowDialog();
         }
 
         private void ChangeVisibilityOfProgressBar(Visibility visibility, bool isIndeterminate = true)
@@ -257,5 +237,51 @@ namespace QR_Code_Tool
                 this.progressBar.IsIndeterminate = isIndeterminate;
             }));
         }
+
+        private void OnAuthorizeCompleted(object sender, GenericSdkEventArgs<string> e)
+        {
+            if (e.Error == null)
+            {
+                AccessToken = e.Result;               
+                this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    this.OnPropertyChanged("IsLoggedIn");
+                    this.OnPropertyChanged("IsLoggedOut");
+                    _ = this.InitFolder(homePath);
+                }));
+            }
+            else
+            {
+                this.ProcessError(e.Error);
+            }
+        }
+
+        public bool IsLoggedIn
+        {
+            get { return !string.IsNullOrEmpty(AccessToken); }
+        }
+
+        public bool IsLoggedOut
+        {
+            get
+            {
+                return !IsLoggedIn;
+            }
+        }
+
+        private void ProcessError(SdkException ex)
+        {
+            Dispatcher.BeginInvoke(new Action(() => MessageBox.Show("SDK error: " + ex.Message)));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        //[NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = this.PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
 }

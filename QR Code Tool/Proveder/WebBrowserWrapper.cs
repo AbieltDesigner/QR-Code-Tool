@@ -3,14 +3,9 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
-using System.Windows.Controls;
 using System.Windows.Navigation;
 using Gecko;
-
-using Disk.SDK.Utils;
 using Gecko.Events;
-using System.Diagnostics;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.SDK.Utils;
 
