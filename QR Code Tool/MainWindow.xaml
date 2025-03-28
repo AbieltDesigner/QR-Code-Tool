@@ -37,7 +37,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
-            <Label Name="LabelDir" Content="Адрес папки"/>
+            <Label Content="{Binding FolderPath}"/>
         </StackPanel>
 
         <DataGrid Name="gridItems" Grid.Row="2" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using QR_Code_Tool.API;
 using QR_Code_Tool.Metods;
-using QR_Code_Tool.Properties;
 using QR_Code_Tool.SDK;
 using YandexDisk.Client.Protocol;
 using MessageBox = System.Windows.MessageBox;
@@ -31,7 +29,8 @@ namespace QR_Code_Tool
         public MainWindow()
         {
             InitializeComponent();               
-            homePath = "Информация для заказчиков и объектов";         
+            homePath = "Информация для заказчиков и объектов";
+            DataContext = this;
             _ = InitFolder(homePath);            
         }
 
@@ -44,7 +43,7 @@ namespace QR_Code_Tool
                 var resource = await api.GetListFilesToFolder(currentPath);
                 gridItems.ItemsSource = resource.Embedded.Items;
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
-                LabelDir.Content = currentPath;
+                this.OnPropertyChanged("FolderPath");
             }                     
         }
 
@@ -269,14 +268,25 @@ namespace QR_Code_Tool
             }
         }
 
+        public string FolderPath
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(currentPath))
+                {
+                    return this.currentPath;
+                }
+                return string.Empty;
+            }
+        }
+
         private void ProcessError(SdkException ex)
         {
             Dispatcher.BeginInvoke(new Action(() => MessageBox.Show("SDK error: " + ex.Message)));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        //[NotifyPropertyChangedInvocator]
+                
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = this.PropertyChanged;
