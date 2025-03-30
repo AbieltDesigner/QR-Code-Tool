@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using QR_Code_Tool.Provider;
+using QR_Code_Tool.SDK;
+using System;
+using System.Threading.Tasks;
 using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool.Metods
@@ -13,6 +16,7 @@ namespace QR_Code_Tool.Metods
 
         Task<Link> PublishFolderOrFile(string folderPath, string filePath = default);
 
-        Task<Link> UnPublishFolderOrFile(string folderPath, string filePath = default);
+        Task<Link> UnPublishFolderOrFile(string folderPath, string filePath = default);       
+
     }
 }

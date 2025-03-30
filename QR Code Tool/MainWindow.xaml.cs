@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
@@ -21,17 +22,19 @@ namespace QR_Code_Tool
     public partial class MainWindow : INotifyPropertyChanged
     {
         private IYandexAPI yandexClient;
-        private LoginWindow loginWindow;        
+        private LoginWindow loginWindow;
+        private ObservableCollection<Resource> folderItems;
         public static string AccessToken { get; set; }
         private string currentPath, previousPath, homePath;     
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);       
 
         public MainWindow()
         {
-            InitializeComponent();               
+            InitializeComponent();
+
             homePath = "Информация для заказчиков и объектов";
             DataContext = this;
-            _ = InitFolder(homePath);            
+            _ = InitFolder(homePath);
         }
 
         private async Task InitFolder(string path)
@@ -39,9 +42,9 @@ namespace QR_Code_Tool
             if (!string.IsNullOrEmpty(AccessToken))
             {               
                 this.currentPath = path;
-                var api = new YandexAPI(AccessToken);
-                var resource = await api.GetListFilesToFolder(currentPath);
-                gridItems.ItemsSource = resource.Embedded.Items;
+                this.yandexClient = new YandexAPI(AccessToken);
+                var resource = await this.yandexClient.GetListFilesToFolder(currentPath);                                
+                _ = this.Dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items);}));
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
                 this.OnPropertyChanged("FolderPath");
             }                     
@@ -97,8 +100,7 @@ namespace QR_Code_Tool
         private async Task Publish(string currentPath)
         {           
             try
-            {
-                var api = new YandexAPI(AccessToken);
+            {                
                 var collectionRows = gridItems.SelectedItems;
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 for (int i = 0; i < collectionRows.Count; i++)
@@ -109,7 +111,7 @@ namespace QR_Code_Tool
                         await semaphoreSlim.WaitAsync();
                         try
                         {                           
-                            await api.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                            await this.yandexClient.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
                         }
                         finally
                         {
@@ -131,8 +133,7 @@ namespace QR_Code_Tool
         private async Task UnPublish(string currentPath)
         {
             try
-            {
-                var api = new YandexAPI(AccessToken);
+            {               
                 var collectionRows = gridItems.SelectedItems;
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 for (int i = 0; i < collectionRows.Count; i++)
@@ -143,7 +144,7 @@ namespace QR_Code_Tool
                         await semaphoreSlim.WaitAsync();
                         try
                         {
-                            await api.UnPublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                            await this.yandexClient.UnPublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
                         }
                         finally
                         {
@@ -193,9 +194,17 @@ namespace QR_Code_Tool
         private void login_Click(object sender, RoutedEventArgs e)
         {          
             AccessToken = string.Empty;
+            this.FolderItems = null;
             this.currentPath = string.Empty;
             this.OnPropertyChanged("IsLoggedIn");
             this.ShowLoginWindow();
+        }
+
+        private void unlogin_Click(object sender, RoutedEventArgs e)
+        {
+            AccessToken = string.Empty;
+            this.currentPath = string.Empty;
+            this.OnPropertyChanged("LoggedIn");            
         }
 
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -222,7 +231,7 @@ namespace QR_Code_Tool
 
         private void ShowLoginWindow()
         {
-            this.loginWindow = new LoginWindow(this.yandexClient);
+            this.loginWindow = new LoginWindow();
             this.loginWindow.AuthCompleted += this.OnAuthorizeCompleted;
             this.loginWindow.ShowDialog();
         }
@@ -252,6 +261,16 @@ namespace QR_Code_Tool
             else
             {
                 this.ProcessError(e.Error);
+            }
+        }
+
+        public ObservableCollection<Resource> FolderItems
+        {
+            get { return this.folderItems; }
+            set
+            {
+                this.folderItems = value;
+                this.OnPropertyChanged("FolderItems");
             }
         }
 

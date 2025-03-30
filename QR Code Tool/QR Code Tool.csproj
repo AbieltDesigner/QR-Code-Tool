@@ -99,7 +99,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Annotations.cs" />
     <Compile Include="Metods\IYandexAPI.cs" />
     <Compile Include="Metods\YandexAPI.cs" />
     <Compile Include="Proveder\IBrowser.cs" />

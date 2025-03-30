@@ -126,6 +126,9 @@
   <data name="BadRequestErrorMessage" xml:space="preserve">
     <value>Incorrect request - provide correct data and try again</value>
   </data>
+  <data name="ClientID" xml:space="preserve">
+    <value>e44807741c564ca9bcbf3cb14ef20be5</value>
+  </data>
   <data name="NotAuthorizedErrorMessage" xml:space="preserve">
     <value>You must be logged in before starting to work with SDK, try to call AuthorizeAsync(...) at first</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="ProviderErrorMessage" xml:space="preserve">
     <value>Can't load SDK provider assembly. Add reference to the platform specific assembly 'Disk.SDK.Provider (platform)' and try again.</value>
+  </data>
+  <data name="ReturnURL" xml:space="preserve">
+    <value>http://127.0.0.1:130/test</value>
   </data>
   <data name="TokenRegexPattern" xml:space="preserve">
     <value>([a-zA-Z0-9]){53}</value>

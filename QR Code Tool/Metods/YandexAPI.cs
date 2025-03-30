@@ -48,9 +48,5 @@ namespace QR_Code_Tool.API
             return await diskHttpApi.MetaInfo.UnpublishFolderAsync(folderPath + filePath);
         }
 
-
-
-
-
     }
 }

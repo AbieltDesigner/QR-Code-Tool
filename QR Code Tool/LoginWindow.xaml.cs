@@ -1,11 +1,10 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Forms.Integration;
-using Gecko;
-using QR_Code_Tool.Metods;
+﻿using Gecko;
 using QR_Code_Tool.Provider;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.SDK.Utils;
+using System;
+using System.Windows;
+using System.Windows.Forms.Integration;
 
 namespace QR_Code_Tool
 {
@@ -13,34 +12,39 @@ namespace QR_Code_Tool
     /// Логика взаимодействия для Loggin.xaml
     /// </summary>
     public partial class LoginWindow : Window
-    {
-        private const string CLIENT_ID = "e44807741c564ca9bcbf3cb14ef20be5";
-        private const string RETURN_URL = "http://127.0.0.1:130/test";
-
-        private readonly IYandexAPI sdkClient;
+    {        
+        private string CLIENT_ID
+        {
+            get
+            {
+                return WebdavResources.ClientID;
+            }
+        }
+        private string RETURN_URL
+        {
+            get
+            {
+                return WebdavResources.ReturnURL;
+            }
+        }
+        
         private static string retUrl;
         private static EventHandler<GenericSdkEventArgs<string>> completeHandler;
-       
-        public LoginWindow()
-        {
-            InitializeComponent();
-            Xpcom.Initialize("Firefox");
-        }
-
+   
+                       
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             
         }
 
-        public LoginWindow(IYandexAPI sdkClient) : this()
+        public LoginWindow()
         {
-
+            InitializeComponent();
+            Xpcom.Initialize("Firefox");
             WindowsFormsHost host = new WindowsFormsHost();
             GeckoWebBrowser browser = new GeckoWebBrowser();
             host.Child = browser;
-            GridWeb.Children.Add(host);     
-            this.sdkClient = sdkClient;
-
+            GridWeb.Children.Add(host);
             AuthorizeAsync(new WebBrowserWrapper(browser), CLIENT_ID, RETURN_URL, this.CompleteCallback);
         }
 
@@ -50,7 +54,6 @@ namespace QR_Code_Tool
             {
                 this.AuthCompleted(this, new GenericSdkEventArgs<string>(e.Result));
             }
-
             this.Close();
         }
 
