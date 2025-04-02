@@ -129,6 +129,9 @@
   <data name="ClientID" xml:space="preserve">
     <value>e44807741c564ca9bcbf3cb14ef20be5</value>
   </data>
+  <data name="ClientSecret" xml:space="preserve">
+    <value>35090a02b8b3485cb632c57d8f337e8b</value>
+  </data>
   <data name="NotAuthorizedErrorMessage" xml:space="preserve">
     <value>You must be logged in before starting to work with SDK, try to call AuthorizeAsync(...) at first</value>
   </data>

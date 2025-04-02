@@ -10,6 +10,7 @@ using System.Windows.Input;
 using QR_Code_Tool.API;
 using QR_Code_Tool.Metods;
 using QR_Code_Tool.SDK;
+using QR_Code_Tool.SDK.Utils;
 using YandexDisk.Client.Protocol;
 using MessageBox = System.Windows.MessageBox;
 
@@ -26,7 +27,9 @@ namespace QR_Code_Tool
         private ObservableCollection<Resource> folderItems;
         public static string AccessToken { get; set; }
         private string currentPath, previousPath, homePath;     
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);       
+        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
+        private string Client_ID { get;} = WebdavResources.ClientID;
+        private string Return_URL { get; } = WebdavResources.ReturnURL;
 
         public MainWindow()
         {
@@ -34,6 +37,7 @@ namespace QR_Code_Tool
 
             homePath = "Информация для заказчиков и объектов";
             DataContext = this;
+            this.ShowLoginWindow(Client_ID, Return_URL);
             _ = InitFolder(homePath);
         }
 
@@ -163,7 +167,6 @@ namespace QR_Code_Tool
             }
         }
 
-
         private void copiLink_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -197,14 +200,16 @@ namespace QR_Code_Tool
             this.FolderItems = null;
             this.currentPath = string.Empty;
             this.OnPropertyChanged("IsLoggedIn");
-            this.ShowLoginWindow();
+            this.ShowLoginWindow(Client_ID, Return_URL);
         }
 
-        private void unlogin_Click(object sender, RoutedEventArgs e)
-        {
-            AccessToken = string.Empty;
+        private void logOut_Click(object sender, RoutedEventArgs e)
+        {                     
+            this.ShowLoginWindow(Client_ID, Return_URL, true);
             this.currentPath = string.Empty;
-            this.OnPropertyChanged("LoggedIn");            
+            AccessToken = string.Empty;
+            this.OnPropertyChanged("IsLoggedIn");
+            this.OnPropertyChanged("IsLoggedOut");
         }
 
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -229,12 +234,14 @@ namespace QR_Code_Tool
             System.Windows.Forms.MessageBox.Show("Пока не реализовано");
         }
 
-        private void ShowLoginWindow()
+        private void ShowLoginWindow(string client_ID, string return_URL, bool isLogout = false)
         {
-            this.loginWindow = new LoginWindow();
+            this.loginWindow = new LoginWindow(client_ID, return_URL);
             this.loginWindow.AuthCompleted += this.OnAuthorizeCompleted;
+            if (isLogout)
+                this.loginWindow.ClearAll();
             this.loginWindow.ShowDialog();
-        }
+        }          
 
         private void ChangeVisibilityOfProgressBar(Visibility visibility, bool isIndeterminate = true)
         {
@@ -311,6 +318,5 @@ namespace QR_Code_Tool
             PropertyChangedEventHandler handler = this.PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
-
     }
 }

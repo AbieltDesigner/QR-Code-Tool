@@ -97,6 +97,15 @@ namespace QR_Code_Tool.SDK.Utils {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на 35090a02b8b3485cb632c57d8f337e8b.
+        /// </summary>
+        internal static string ClientSecret {
+            get {
+                return ResourceManager.GetString("ClientSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на You must be logged in before starting to work with SDK, try to call AuthorizeAsync(...) at first.
         /// </summary>
         internal static string NotAuthorizedErrorMessage {

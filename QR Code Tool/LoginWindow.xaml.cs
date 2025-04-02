@@ -12,30 +12,10 @@ namespace QR_Code_Tool
     /// Логика взаимодействия для Loggin.xaml
     /// </summary>
     public partial class LoginWindow : Window
-    {        
-        private string CLIENT_ID
-        {
-            get
-            {
-                return WebdavResources.ClientID;
-            }
-        }
-        private string RETURN_URL
-        {
-            get
-            {
-                return WebdavResources.ReturnURL;
-            }
-        }
-        
+    {     
         private static string retUrl;
+        private GeckoWebBrowser browser;
         private static EventHandler<GenericSdkEventArgs<string>> completeHandler;
-   
-                       
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
 
         public LoginWindow()
         {
@@ -44,8 +24,19 @@ namespace QR_Code_Tool
             WindowsFormsHost host = new WindowsFormsHost();
             GeckoWebBrowser browser = new GeckoWebBrowser();
             host.Child = browser;
+            this.browser = browser;
             GridWeb.Children.Add(host);
-            AuthorizeAsync(new WebBrowserWrapper(browser), CLIENT_ID, RETURN_URL, this.CompleteCallback);
+        }
+
+        public LoginWindow(string clientID, string returnURL):this()
+        {
+            AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
+        }
+
+        public LoginWindow(string clientID, string returnURL, string clientSecret) : this()
+        {
+            
+            //AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
         }
 
         private void CompleteCallback(object sender, GenericSdkEventArgs<string> e)
@@ -55,6 +46,14 @@ namespace QR_Code_Tool
                 this.AuthCompleted(this, new GenericSdkEventArgs<string>(e.Result));
             }
             this.Close();
+        }
+
+        public void ClearAll()
+        {
+            nsICookieManager CookieMan;
+            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
+            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
+            CookieMan.RemoveAll();
         }
 
         public void AuthorizeAsync(IBrowser browser, string clientId, string returnUrl, EventHandler<GenericSdkEventArgs<string>> completeCallback)
