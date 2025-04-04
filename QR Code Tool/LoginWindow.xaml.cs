@@ -33,12 +33,6 @@ namespace QR_Code_Tool
             AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
         }
 
-        public LoginWindow(string clientID, string returnURL, string clientSecret) : this()
-        {
-            
-            //AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
-        }
-
         private void CompleteCallback(object sender, GenericSdkEventArgs<string> e)
         {
             if (this.AuthCompleted != null)

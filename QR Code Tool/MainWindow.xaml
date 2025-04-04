@@ -40,7 +40,7 @@
             <Label Content="{Binding FolderPath}"/>
         </StackPanel>
 
-        <DataGrid Name="gridItems" Grid.Row="2" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" 
+        <DataGrid Grid.Row="2" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" 
                   CanUserAddRows="False" IsReadOnly="True" SelectionChanged="gridItems_SelectionChanged">
             <DataGrid.Resources>
                 <Style TargetType="DataGridRow">

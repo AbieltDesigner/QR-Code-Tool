@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,10 +26,11 @@ namespace QR_Code_Tool
     {
         private IYandexAPI yandexClient;
         private LoginWindow loginWindow;
-        private ObservableCollection<Resource> folderItems;
-        public static string AccessToken { get; set; }
-        private string currentPath, previousPath, homePath;     
+        private ObservableCollection<Resource> folderItems;      
+        private string currentPath, previousPath, homePath;
+        private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
+        public static string AccessToken { get; set; }
         private string Client_ID { get;} = WebdavResources.ClientID;
         private string Return_URL { get; } = WebdavResources.ReturnURL;
 
@@ -105,11 +108,10 @@ namespace QR_Code_Tool
         {           
             try
             {                
-                var collectionRows = gridItems.SelectedItems;
+                var collectionRows = selectedItems.AsEnumerable<Resource>();
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-                for (int i = 0; i < collectionRows.Count; i++)
+                foreach (var rowDataDisk in collectionRows)
                 {
-                    Resource rowDataDisk = (Resource)collectionRows[i];
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
                     {
                         await semaphoreSlim.WaitAsync();
@@ -137,12 +139,11 @@ namespace QR_Code_Tool
         private async Task UnPublish(string currentPath)
         {
             try
-            {               
-                var collectionRows = gridItems.SelectedItems;
+            {
+                var collectionRows = selectedItems.AsEnumerable<Resource>();
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-                for (int i = 0; i < collectionRows.Count; i++)
-                {
-                    Resource rowDataDisk = (Resource)collectionRows[i];
+                foreach (var rowDataDisk in collectionRows)
+                {                   
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
                     {
                         await semaphoreSlim.WaitAsync();
@@ -171,7 +172,7 @@ namespace QR_Code_Tool
         {
             try
             {
-                Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
+                var rowDataDisk = selectedItems.FirstOrDefault();
                 if (rowDataDisk.PublicUrl == null)
                 {
                     MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);  
@@ -214,13 +215,30 @@ namespace QR_Code_Tool
 
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-                      
+            if (e.AddedItems.Count > 0)
+            {
+                var items = e.AddedItems.Cast<Resource>();
+                foreach (var item in items)
+                {
+                    this.selectedItems.Add(item);
+                }
+            }
+
+            if (e.RemovedItems.Count > 0)
+            {
+                var items = e.RemovedItems.Cast<Resource>();
+                foreach (var item in items)
+                {
+                    this.selectedItems.Remove(item);
+                }
+            }
+
+            //this.NotifyMenuItems();
         }
 
         private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
         {
-            //DataGridRow row = sender as DataGridRow;
-            Resource rowDataDisk = (Resource)gridItems.SelectedItems[0];
+            var rowDataDisk = selectedItems.FirstOrDefault();
             if (rowDataDisk.Type is ResourceType.Dir)
             {
                 previousPath = currentPath;
@@ -231,7 +249,8 @@ namespace QR_Code_Tool
 
         private void printQR_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("Пока не реализовано");
+            var printZPL = new PrintZPL(selectedItems.AsEnumerable());
+            printZPL.Print();   
         }
 
         private void ShowLoginWindow(string client_ID, string return_URL, bool isLogout = false)
