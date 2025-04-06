@@ -1,4 +1,8 @@
-﻿using System;
+﻿using QR_Code_Tool.API;
+using QR_Code_Tool.Metods;
+using QR_Code_Tool.SDK;
+using QR_Code_Tool.SDK.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,37 +13,46 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using QR_Code_Tool.API;
-using QR_Code_Tool.Metods;
-using QR_Code_Tool.SDK;
-using QR_Code_Tool.SDK.Utils;
+using System.Windows.Threading;
 using YandexDisk.Client.Protocol;
-using MessageBox = System.Windows.MessageBox;
 
-
-namespace QR_Code_Tool
+namespace QR_Code_Tool.VievModels
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : INotifyPropertyChanged
+    class MainVievModel : INotifyPropertyChanged
     {
         private IYandexAPI yandexClient;
         private LoginWindow loginWindow;
-        private ObservableCollection<Resource> folderItems;      
+        private ObservableCollection<Resource> folderItems;
         private string currentPath, previousPath, homePath;
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
         public static string AccessToken { get; set; }
-        private string Client_ID { get;} = WebdavResources.ClientID;
+        private string Client_ID { get; } = WebdavResources.ClientID;
         private string Return_URL { get; } = WebdavResources.ReturnURL;
 
-        public MainWindow()
+        private ICommand _goHome;
+        public ICommand GoHome
         {
-            InitializeComponent();
+            get
+            {
+                if (_goHome == null)
+                {
+                    _goHome = new RelayCommand(
+                        param => this.GoHome_Click()
+                    );
+                }
+                return _goHome;
+            }
+        }
+        private void GoHome_Click()
+        {
+            this.previousPath = this.currentPath;
+            _ = this.InitFolder(homePath);
+        }
 
-            homePath = "Информация для заказчиков и объектов";
-            DataContext = this;
+        public MainVievModel()
+        {
+            homePath = "Информация для заказчиков и объектов";         
             this.ShowLoginWindow(Client_ID, Return_URL);
             _ = InitFolder(homePath);
         }
@@ -47,20 +60,14 @@ namespace QR_Code_Tool
         private async Task InitFolder(string path)
         {
             if (!string.IsNullOrEmpty(AccessToken))
-            {               
+            {
                 this.currentPath = path;
                 this.yandexClient = new YandexAPI(AccessToken);
-                var resource = await this.yandexClient.GetListFilesToFolder(currentPath);                                
-                _ = this.Dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items);}));
+                var resource = await this.yandexClient.GetListFilesToFolder(currentPath);
+                _ = this.Dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items); }));
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
                 this.OnPropertyChanged("FolderPath");
-            }                     
-        }
-
-        private void home_Click(object sender, RoutedEventArgs e)
-        {
-            this.previousPath = this.currentPath;
-            _ = this.InitFolder(homePath);
+            }
         }
 
         private void back_Click(object sender, RoutedEventArgs e)
@@ -71,14 +78,14 @@ namespace QR_Code_Tool
         }
 
         private void goUp_Click(object sender, RoutedEventArgs e)
-        {            
+        {
             var delimeterIndex = this.currentPath.Length > 1 ? this.currentPath.LastIndexOf("/", this.currentPath.Length - 2) : 0;
             if (delimeterIndex > 0)
             {
                 var topPath = this.currentPath.Substring(0, delimeterIndex);
                 this.previousPath = this.currentPath;
                 _ = this.InitFolder(topPath);
-            }       
+            }
         }
 
         private void refresh_Click(object sender, RoutedEventArgs e)
@@ -88,12 +95,12 @@ namespace QR_Code_Tool
 
         private void publish_Click(object sender, RoutedEventArgs e)
         {
-            _ = Publish(this.currentPath);           
+            _ = Publish(this.currentPath);
         }
 
         private void unpublish_Click(object sender, RoutedEventArgs e)
         {
-            _ = UnPublish(this.currentPath);            
+            _ = UnPublish(this.currentPath);
         }
         private void deleteFile_Click(object sender, RoutedEventArgs e)
         {
@@ -105,9 +112,9 @@ namespace QR_Code_Tool
         }
 
         private async Task Publish(string currentPath)
-        {           
+        {
             try
-            {                
+            {
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 foreach (var rowDataDisk in collectionRows)
@@ -116,15 +123,15 @@ namespace QR_Code_Tool
                     {
                         await semaphoreSlim.WaitAsync();
                         try
-                        {                           
+                        {
                             await this.yandexClient.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
                         }
                         finally
                         {
                             semaphoreSlim.Release();
                         }
-                    }                   
-                }                   
+                    }
+                }
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -132,10 +139,10 @@ namespace QR_Code_Tool
             }
             finally
             {
-                _= this.InitFolder(this.currentPath);
-            }            
+                _ = this.InitFolder(this.currentPath);
+            }
         }
-               
+
         private async Task UnPublish(string currentPath)
         {
             try
@@ -143,7 +150,7 @@ namespace QR_Code_Tool
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 foreach (var rowDataDisk in collectionRows)
-                {                   
+                {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
                     {
                         await semaphoreSlim.WaitAsync();
@@ -175,13 +182,13 @@ namespace QR_Code_Tool
                 var rowDataDisk = selectedItems.FirstOrDefault();
                 if (rowDataDisk.PublicUrl == null)
                 {
-                    MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);  
+                    MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else
                 {
                     System.Windows.Clipboard.SetText(rowDataDisk.PublicUrl);
                     MessageBox.Show("Ссылка скопирована в буфер обмена.", "Удачно", MessageBoxButton.OK, MessageBoxImage.Information);
-                }                                  
+                }
             }
 
             catch (ArgumentOutOfRangeException ex)
@@ -196,7 +203,7 @@ namespace QR_Code_Tool
         }
 
         private void login_Click(object sender, RoutedEventArgs e)
-        {          
+        {
             AccessToken = string.Empty;
             this.FolderItems = null;
             this.currentPath = string.Empty;
@@ -205,7 +212,7 @@ namespace QR_Code_Tool
         }
 
         private void logOut_Click(object sender, RoutedEventArgs e)
-        {                     
+        {
             this.ShowLoginWindow(Client_ID, Return_URL, true);
             this.currentPath = string.Empty;
             AccessToken = string.Empty;
@@ -250,7 +257,7 @@ namespace QR_Code_Tool
         private void printQR_Click(object sender, RoutedEventArgs e)
         {
             var printZPL = new PrintZPL(selectedItems.AsEnumerable());
-            printZPL.Print();   
+            printZPL.Print();
         }
 
         private void ShowLoginWindow(string client_ID, string return_URL, bool isLogout = false)
@@ -260,23 +267,23 @@ namespace QR_Code_Tool
             if (isLogout)
                 this.loginWindow.ClearAll();
             this.loginWindow.ShowDialog();
-        }          
+        }
 
         private void ChangeVisibilityOfProgressBar(Visibility visibility, bool isIndeterminate = true)
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.progressBar.Value = 0;
-                this.progressBar.Visibility = visibility;
-                this.progressBar.IsIndeterminate = isIndeterminate;
-            }));
+            //this.Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //    this.progressBar.Value = 0;
+            //    this.progressBar.Visibility = visibility;
+            //    this.progressBar.IsIndeterminate = isIndeterminate;
+            //}));
         }
 
         private void OnAuthorizeCompleted(object sender, GenericSdkEventArgs<string> e)
         {
             if (e.Error == null)
             {
-                AccessToken = e.Result;               
+                AccessToken = e.Result;
                 this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     this.OnPropertyChanged("IsLoggedIn");
@@ -327,11 +334,11 @@ namespace QR_Code_Tool
 
         private void ProcessError(SdkException ex)
         {
-            this.Dispatcher.BeginInvoke(new Action(() => MessageBox.Show("SDK error: " + ex.Message)));
+            Dispatcher.BeginInvoke(new Action(() => MessageBox.Show("SDK error: " + ex.Message)));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-                
+
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = this.PropertyChanged;
