@@ -135,6 +135,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>WebdavResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Serializable\AppSettingsDeserialize.cs" />
+    <Compile Include="Serializable\Entity\AppSettings.cs" />
+    <Compile Include="Serializable\Entity\ClientSettings.cs" />
+    <Compile Include="Serializable\Entity\IClientSettings.cs" />
+    <Compile Include="Serializable\Entity\IPrintSettings.cs" />
+    <Compile Include="Serializable\Entity\PrintSettings.cs" />
     <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -179,6 +185,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>WebdavResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Config\appSettings.json" />
     <None Include="Firefox\omni.ja" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
