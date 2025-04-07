@@ -138,6 +138,8 @@
     <Compile Include="Serializable\AppSettingsDeserialize.cs" />
     <Compile Include="Serializable\Entity\AppSettings.cs" />
     <Compile Include="Serializable\Entity\ClientSettings.cs" />
+    <Compile Include="Serializable\Entity\FolderSettings.cs" />
+    <Compile Include="Serializable\Entity\IFolderSettings.cs" />
     <Compile Include="Serializable\Entity\IClientSettings.cs" />
     <Compile Include="Serializable\Entity\IPrintSettings.cs" />
     <Compile Include="Serializable\Entity\PrintSettings.cs" />

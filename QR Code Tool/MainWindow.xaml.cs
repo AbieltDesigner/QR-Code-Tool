@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using QR_Code_Tool.API;
 using QR_Code_Tool.Metods;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.SDK.Utils;
+using QR_Code_Tool.Serializable;
 using YandexDisk.Client.Protocol;
 using MessageBox = System.Windows.MessageBox;
 
@@ -27,18 +29,23 @@ namespace QR_Code_Tool
         private IYandexAPI yandexClient;
         private LoginWindow loginWindow;
         private ObservableCollection<Resource> folderItems;      
-        private string currentPath, previousPath, homePath;
+        private string currentPath, previousPath;
+        private readonly string homePath;
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
+        private readonly string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
         public static string AccessToken { get; set; }
-        private string Client_ID { get;} = WebdavResources.ClientID;
-        private string Return_URL { get; } = WebdavResources.ReturnURL;
+        private readonly string Client_ID;
+        private readonly string Return_URL;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            homePath = "Информация для заказчиков и объектов";
+            AppSettingsDeserialize app = new AppSettingsDeserialize(jsonFilePath);
+            var settings = app.GetSettingsModels();
+            this.Client_ID = settings.ClientSettings.clientId;
+            this.Return_URL = @"http://" + settings.ClientSettings.returnUrl;
+            homePath = settings.FolderSettings.HomeFolder;
             DataContext = this;
             this.ShowLoginWindow(Client_ID, Return_URL);
             _ = InitFolder(homePath);
