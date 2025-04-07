@@ -13,7 +13,6 @@ using System.Windows.Input;
 using QR_Code_Tool.API;
 using QR_Code_Tool.Metods;
 using QR_Code_Tool.SDK;
-using QR_Code_Tool.SDK.Utils;
 using QR_Code_Tool.Serializable;
 using YandexDisk.Client.Protocol;
 using MessageBox = System.Windows.MessageBox;
@@ -33,7 +32,7 @@ namespace QR_Code_Tool
         private readonly string homePath;
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
-        private readonly string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
+        private readonly string jsonFilePath;
         public static string AccessToken { get; set; }
         private readonly string Client_ID;
         private readonly string Return_URL;
@@ -41,12 +40,13 @@ namespace QR_Code_Tool
         public MainWindow()
         {
             InitializeComponent();
+            this.jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             AppSettingsDeserialize app = new AppSettingsDeserialize(jsonFilePath);
             var settings = app.GetSettingsModels();
             this.Client_ID = settings.ClientSettings.clientId;
             this.Return_URL = @"http://" + settings.ClientSettings.returnUrl;
-            homePath = settings.FolderSettings.HomeFolder;
-            DataContext = this;
+            this.homePath = settings.FolderSettings.HomeFolder;
+            this.DataContext = this;
             this.ShowLoginWindow(Client_ID, Return_URL);
             _ = InitFolder(homePath);
         }

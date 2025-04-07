@@ -187,7 +187,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>WebdavResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Config\appSettings.json" />
+    <None Include="Config\appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Firefox\omni.ja" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
