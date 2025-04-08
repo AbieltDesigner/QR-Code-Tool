@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.Win32;
 using QR_Code_Tool.API;
 using QR_Code_Tool.Metods;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.Serializable;
+using QR_Code_Tool.Serializable.Entity;
 using YandexDisk.Client.Protocol;
 using MessageBox = System.Windows.MessageBox;
 
@@ -33,6 +35,7 @@ namespace QR_Code_Tool
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
         private readonly string jsonFilePath;
+        private readonly AppSettings appSettings;
         public static string AccessToken { get; set; }
         private readonly string Client_ID;
         private readonly string Return_URL;
@@ -42,10 +45,10 @@ namespace QR_Code_Tool
             InitializeComponent();
             this.jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             AppSettingsDeserialize app = new AppSettingsDeserialize(jsonFilePath);
-            var settings = app.GetSettingsModels();
-            this.Client_ID = settings.ClientSettings.clientId;
-            this.Return_URL = @"http://" + settings.ClientSettings.returnUrl;
-            this.homePath = settings.FolderSettings.HomeFolder;
+            this.appSettings = app.GetSettingsModels();
+            this.Client_ID = appSettings.ClientSettings.clientId;
+            this.Return_URL = @"http://" + appSettings.ClientSettings.returnUrl;
+            this.homePath = appSettings.FolderSettings.HomeFolder;
             this.DataContext = this;
             this.ShowLoginWindow(Client_ID, Return_URL);
             _ = InitFolder(homePath);
@@ -57,7 +60,7 @@ namespace QR_Code_Tool
             {               
                 this.currentPath = path;
                 this.yandexClient = new YandexAPI(AccessToken);
-                var resource = await this.yandexClient.GetListFilesToFolder(currentPath);                                
+                var resource = await this.yandexClient.GetListFilesToFolderAsync(currentPath);                                
                 _ = this.Dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items);}));
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
                 this.OnPropertyChanged("FolderPath");
@@ -70,14 +73,14 @@ namespace QR_Code_Tool
             _ = this.InitFolder(homePath);
         }
 
-        private void back_Click(object sender, RoutedEventArgs e)
+        private void goUp_Click(object sender, RoutedEventArgs e)
         {
             var previous = this.previousPath;
             this.previousPath = this.currentPath;
             _ = this.InitFolder(previous);
         }
 
-        private void goUp_Click(object sender, RoutedEventArgs e)
+        private void back_Click(object sender, RoutedEventArgs e)
         {            
             var delimeterIndex = this.currentPath.Length > 1 ? this.currentPath.LastIndexOf("/", this.currentPath.Length - 2) : 0;
             if (delimeterIndex > 0)
@@ -102,21 +105,42 @@ namespace QR_Code_Tool
         {
             _ = UnPublish(this.currentPath);            
         }
+
         private void deleteFile_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("Пока не реализовано");
+            _ = DeleteFile(this.currentPath);
         }
         private void upLoadFile_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("Пока не реализовано");
+            _ = UpLoadFile();
         }
+
+        private async Task UpLoadFile()
+        {
+            var openDialog = new OpenFileDialog();
+            if (openDialog.ShowDialog() == true)
+            {
+                this.ShowProgress(false);
+                var stream = openDialog.OpenFile();
+                var fileName = Path.GetFileName(openDialog.FileName);
+                var filePath = this.currentPath + "/" + fileName;
+                await this.yandexClient.UpLoadFileAsync(filePath, stream);
+                //this.sdk.UploadFileAsync(filePath, stream, new AsyncProgress(this.UpdateProgress), this.SdkOnUploadCompleted);
+            }
+            else
+            {
+                this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
+            }
+            _ = this.InitFolder(this.currentPath);
+        }
+
 
         private async Task Publish(string currentPath)
         {           
             try
             {                
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
-                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                this.ShowProgress(false);
                 foreach (var rowDataDisk in collectionRows)
                 {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
@@ -124,7 +148,7 @@ namespace QR_Code_Tool
                         await semaphoreSlim.WaitAsync();
                         try
                         {                           
-                            await this.yandexClient.PublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                            await this.yandexClient.PublishFolderOrFileAsync(currentPath + "/" + rowDataDisk.Name);
                         }
                         finally
                         {
@@ -148,7 +172,7 @@ namespace QR_Code_Tool
             try
             {
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
-                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                this.ShowProgress(false);
                 foreach (var rowDataDisk in collectionRows)
                 {                   
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
@@ -156,7 +180,39 @@ namespace QR_Code_Tool
                         await semaphoreSlim.WaitAsync();
                         try
                         {
-                            await this.yandexClient.UnPublishFolderOrFile(currentPath + "/" + rowDataDisk.Name);
+                            await this.yandexClient.UnPublishFolderOrFileAsync(currentPath + "/" + rowDataDisk.Name);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    }
+                }
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+            finally
+            {
+                _ = this.InitFolder(this.currentPath);
+            }
+        }
+
+        private async Task DeleteFile(string currentPath)
+        {
+            try
+            {
+                var collectionRows = selectedItems.AsEnumerable<Resource>();
+                this.ShowProgress(false);
+                foreach (var rowDataDisk in collectionRows)
+                {
+                    if (rowDataDisk.Name != null)
+                    {
+                        await semaphoreSlim.WaitAsync();
+                        try
+                        {
+                            await this.yandexClient.DeleteFileAsync(currentPath + "/" + rowDataDisk.Name);
                         }
                         finally
                         {
@@ -239,7 +295,6 @@ namespace QR_Code_Tool
                     this.selectedItems.Remove(item);
                 }
             }
-
             //this.NotifyMenuItems();
         }
 
@@ -256,7 +311,7 @@ namespace QR_Code_Tool
 
         private void printQR_Click(object sender, RoutedEventArgs e)
         {
-            var printZPL = new PrintZPL(selectedItems.AsEnumerable());
+            var printZPL = new PrintZPL(selectedItems.AsEnumerable(), appSettings.PrintSettings);
             printZPL.Print();   
         }
 
@@ -267,7 +322,12 @@ namespace QR_Code_Tool
             if (isLogout)
                 this.loginWindow.ClearAll();
             this.loginWindow.ShowDialog();
-        }          
+        }
+        private void ShowProgress(bool isIndeterminate = true)
+        {
+            this.progressBar.Visibility = Visibility.Visible;
+            //this.progressBar.IsIndeterminate = isIndeterminate;
+        }
 
         private void ChangeVisibilityOfProgressBar(Visibility visibility, bool isIndeterminate = true)
         {

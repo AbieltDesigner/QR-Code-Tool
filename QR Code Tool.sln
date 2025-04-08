@@ -5,8 +5,6 @@ VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QR Code Tool", "QR Code Tool\QR Code Tool.csproj", "{013F86F2-44B1-41FD-8FEC-C32C2356661B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serializator", "Serializator\Serializator.csproj", "{701EC415-12A8-4433-BEC8-B57B186BBBAF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,14 +21,6 @@ Global
 		{013F86F2-44B1-41FD-8FEC-C32C2356661B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{013F86F2-44B1-41FD-8FEC-C32C2356661B}.Release|x86.ActiveCfg = Release|x86
 		{013F86F2-44B1-41FD-8FEC-C32C2356661B}.Release|x86.Build.0 = Release|x86
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Debug|x86.Build.0 = Debug|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Release|x86.ActiveCfg = Release|Any CPU
-		{701EC415-12A8-4433-BEC8-B57B186BBBAF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

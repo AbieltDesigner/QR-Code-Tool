@@ -4,24 +4,26 @@ using System.Diagnostics;
 using System.IO.Ports;
 using BinaryKits.Zpl.Label;
 using BinaryKits.Zpl.Label.Elements;
+using QR_Code_Tool.Serializable.Entity;
 using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool.Metods
 {
     public class PrintZPL
     {
-        private string printerPortName = "COM3";
         private readonly IEnumerable<Resource> items;
-        public PrintZPL(IEnumerable<Resource> items)
+        private readonly IPrintSettings printSettings;
+        public PrintZPL(IEnumerable<Resource> items, IPrintSettings printSettings)
         {
             this.items = items;
+            this.printSettings = printSettings;
         }
         public void Print()
         {
             foreach (Resource item in items)
             {
                 var sampleText = item.Name;
-                var font = new ZplFont(fontWidth: 50, fontHeight: 50);
+                var font = new ZplFont(fontWidth: printSettings.SizeFont, fontHeight: printSettings.SizeFont);
                 var elements = new List<ZplElementBase>();
                 elements.Add(new ZplTextField(sampleText, 50, 100, font));
                 elements.Add(new ZplQrCode(item.PublicUrl, 100, 200, 2, 12));
@@ -37,7 +39,7 @@ namespace QR_Code_Tool.Metods
         {
             try
             {
-                using (SerialPort printerPort = new SerialPort(printerPortName, 9600, Parity.None, 8, StopBits.One))
+                using (SerialPort printerPort = new SerialPort(printSettings.ComPort, 9600, Parity.None, 8, StopBits.One))
                 {
                     printerPort.Open();
                     printerPort.Write(zplData);

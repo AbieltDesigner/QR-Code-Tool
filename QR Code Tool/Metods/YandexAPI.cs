@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using QR_Code_Tool.Metods;
+using YandexDisk.Client.Clients;
 using YandexDisk.Client.Http;
 using YandexDisk.Client.Protocol;
 
@@ -26,27 +28,38 @@ namespace QR_Code_Tool.API
             get { return this.accessToken; }
         }
 
-        public async Task<Resource> GetListFilesToFolder(string currentPath)
+        public async Task<Resource> GetListFilesToFolderAsync(string currentPath)
         {           
             string filePath = $@"disk:/" + $"{currentPath}";
             return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath });          
         }
 
-        public async Task GetFileInfo(string folderPath, string filePath)
+        public async Task GetFileInfoAsync(string folderPath, string filePath)
         {          
             string fullPath = $@"disk:/" + $"{folderPath}" + "/" + $"{filePath}";
             await diskHttpApi.Files.GetDownloadLinkAsync(fullPath);
         }
 
-        public async Task<Link> PublishFolderOrFile(string folderPath, string filePath = default)
+        public async Task<Link> PublishFolderOrFileAsync(string filePath)
         {
-            return await diskHttpApi.MetaInfo.PublishFolderAsync(folderPath + filePath);         
+            return await diskHttpApi.MetaInfo.PublishFolderAsync(filePath);         
         }
 
-        public async Task<Link> UnPublishFolderOrFile(string folderPath, string filePath = default)
+        public async Task<Link> UnPublishFolderOrFileAsync(string filePath)
         {
-            return await diskHttpApi.MetaInfo.UnpublishFolderAsync(folderPath + filePath);
+            return await diskHttpApi.MetaInfo.UnpublishFolderAsync(filePath);
         }
 
+        public async Task DeleteFileAsync(string filePath)
+        {
+            var deleteFileRequest = new DeleteFileRequest() 
+                { Path = (filePath), Permanently = false };
+            await diskHttpApi.Commands.DeleteAsync(deleteFileRequest);
+        }
+
+        public async Task UpLoadFileAsync(string filePath, Stream file)
+        {
+            await diskHttpApi.Files.UploadFileAsync(filePath, false, file);
+        }
     }
 }

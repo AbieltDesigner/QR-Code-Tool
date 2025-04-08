@@ -20,6 +20,15 @@
             <Setter Property="Width" Value="60"/>
             <Setter Property="Height" Value="30"/>
         </Style>
+
+        <Style x:Key="imageButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value= "5,0,5,0"/>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
@@ -31,9 +40,31 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoggedIn}">
-            <Button Style="{StaticResource buttonStyle}" Content="Home" Click="home_Click" />
-            <Button Style="{StaticResource buttonStyle}" Content="Go up" Click="goUp_Click" />
-            <Button Style="{StaticResource buttonStyle}" Content="Go back" Click="back_Click" />
+
+            <Button Style="{StaticResource imageButtonStyle}" ToolTip="Назад" Click="back_Click">
+                <Button.Content>
+                    <Image Source="pack://siteoforigin:,,,/Resources/gui_back.png"/>
+                </Button.Content>
+            </Button>
+
+            <Button Style="{StaticResource imageButtonStyle}" ToolTip="Обратно" Click="goUp_Click">
+                <Button.Content>
+                    <Image Source="pack://siteoforigin:,,,/Resources/gui_undo.png"/>
+                </Button.Content>
+            </Button>
+
+            <Button Style="{StaticResource imageButtonStyle}" ToolTip="Обновить" Click="refresh_Click">
+                <Button.Content>
+                    <Image Source="pack://siteoforigin:,,,/Resources/gui_refresh.png"/>
+                </Button.Content>
+            </Button>
+
+            <Button Style="{StaticResource imageButtonStyle}" ToolTip="В домашнюю дирректорию" Click="home_Click">
+                <Button.Content>
+                    <Image Source="pack://siteoforigin:,,,/Resources/gui_home.png"/>
+                    </Button.Content>
+            </Button>
+            
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
@@ -65,8 +96,7 @@
             </DataGrid.ContextMenu>           
         </DataGrid>
 
-        <DockPanel  Grid.Row="3" VerticalAlignment="Bottom" IsEnabled="{Binding IsLoggedIn}" HorizontalAlignment="Left">
-            <Button Style="{StaticResource buttonStyle}" Content="Обновить" Click="refresh_Click" Width="110"/>
+        <DockPanel  Grid.Row="3" VerticalAlignment="Bottom" IsEnabled="{Binding IsLoggedIn}" HorizontalAlignment="Left">        
             <Button Style="{StaticResource buttonStyle}" Content="Печать QR" Click="printQR_Click" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="publish_Click" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="unpublish_Click" Width="110" />
