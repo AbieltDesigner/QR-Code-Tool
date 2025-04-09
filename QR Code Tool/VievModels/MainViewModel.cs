@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Gecko;
+using Microsoft.Win32;
+using QR_Code_Tool.API;
+using QR_Code_Tool.Metods;
+using QR_Code_Tool.SDK;
+using QR_Code_Tool.Serializable;
+using QR_Code_Tool.Serializable.Entity;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,25 +18,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Gecko;
-using Microsoft.Win32;
-using QR_Code_Tool.API;
-using QR_Code_Tool.Metods;
-using QR_Code_Tool.SDK;
-using QR_Code_Tool.Serializable;
-using QR_Code_Tool.Serializable.Entity;
 using YandexDisk.Client.Protocol;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace QR_Code_Tool.VievModels
 {
 
-    public class MainViewModel :INotifyPropertyChanged, IMainViewModel
+    public class MainViewModel : INotifyPropertyChanged, IMainViewModel
     {
         private IYandexAPI yandexClient;
         private LoginWindow loginWindow;
         private ObservableCollection<Resource> folderItems;
-        private Visibility isProressVisibility; 
+        private Visibility isProressVisibility;
         private string currentPath, previousPath;
         private readonly string homePath;
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
@@ -106,7 +105,7 @@ namespace QR_Code_Tool.VievModels
         public MainViewModel(Dispatcher dispatcher)
         {
             this.dispatcher = dispatcher;
-            this.jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
+            this.jsonFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             this.appSettingsDeserialize = new AppSettingsDeserialize(jsonFilePath);
             this.appSettings = appSettingsDeserialize.GetSettingsModels();
             this.Client_ID = appSettings.ClientSettings.clientId;
@@ -123,12 +122,12 @@ namespace QR_Code_Tool.VievModels
                 this.currentPath = path;
                 this.yandexClient = new YandexAPI(AccessToken);
                 var resource = await this.yandexClient.GetListFilesToFolderAsync(currentPath);
-                _ = this.dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items); }));              
+                _ = this.dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items); }));
                 this.OnPropertyChanged("FolderPath");
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
             }
-        }    
-        
+        }
+
         private void Back()
         {
             var delimeterIndex = this.currentPath.Length > 1 ? this.currentPath.LastIndexOf("/", this.currentPath.Length - 2) : 0;
@@ -209,7 +208,7 @@ namespace QR_Code_Tool.VievModels
 
             this.FolderItems = null;
             this.currentPath = string.Empty;
-            AccessToken = string.Empty;           
+            AccessToken = string.Empty;
 
             this.currentPath = string.Empty;
             AccessToken = string.Empty;
@@ -229,7 +228,7 @@ namespace QR_Code_Tool.VievModels
         {
             try
             {
-                var collectionRows = selectedItems.AsEnumerable<Resource>();         
+                var collectionRows = selectedItems.AsEnumerable<Resource>();
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 foreach (var rowDataDisk in collectionRows)
                 {
@@ -288,59 +287,78 @@ namespace QR_Code_Tool.VievModels
             }
         }
         private async Task UpLoadFile()
-        {
-            throw new NotImplementedException();
-
+        {            
             var openDialog = new OpenFileDialog();
             openDialog.Multiselect = true;
-
 
             if (openDialog.ShowDialog() == true)
             {
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-                foreach (string file in openDialog.FileNames)
+                var streams = openDialog.OpenFiles();
+
+                foreach (Stream stream in streams)
                 {
-                    var stream = openDialog.OpenFile();
-                    var fileName = Path.GetFileName(openDialog.FileName);
-                    var filePath = this.currentPath + "/" + fileName;
-                    await this.yandexClient.UpLoadFileAsync(filePath, stream);
-                }               
+                    FileStream fs = stream as FileStream;
+                    if (fs != null)
+                    {                  
+                        var fileName = System.IO.Path.GetFileName(fs.Name);
+                        var filePath = this.currentPath + "/" + fileName;
+                        await semaphoreSlim.WaitAsync();
+                        try
+                        {
+                            await this.yandexClient.UpLoadFileAsync(filePath, stream);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    }                 
+                }
             }
             else
             {
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
             }
             _ = this.InitFolder(this.currentPath);
-        }              
+        }
+              
         private async Task DeleteFile(string currentPath)
         {
-            try
+            MessageBoxResult result = MessageBox.Show(
+                "Удалить выбранные файлы?",
+                "Сообщение",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+            if (result == MessageBoxResult.Yes)
             {
-                var collectionRows = selectedItems.AsEnumerable<Resource>();             
-                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-                foreach (var rowDataDisk in collectionRows)
+                try
                 {
-                    if (rowDataDisk.Name != null)
+                    var collectionRows = selectedItems.AsEnumerable<Resource>();
+                    this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                    foreach (var rowDataDisk in collectionRows)
                     {
-                        await semaphoreSlim.WaitAsync();
-                        try
+                        if (rowDataDisk.Name != null)
                         {
-                            await this.yandexClient.DeleteFileAsync(currentPath + "/" + rowDataDisk.Name);
-                        }
-                        finally
-                        {
-                            semaphoreSlim.Release();
+                            await semaphoreSlim.WaitAsync();
+                            try
+                            {
+                                await this.yandexClient.DeleteFileAsync(currentPath + "/" + rowDataDisk.Name);
+                            }
+                            finally
+                            {
+                                semaphoreSlim.Release();
+                            }
                         }
                     }
                 }
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
-            }
-            finally
-            {
-                _ = this.InitFolder(this.currentPath);
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    Debug.WriteLine($"Произошло исключение {ex.Message}");
+                }
+                finally
+                {
+                    _ = this.InitFolder(this.currentPath);
+                }
             }
         }
 
@@ -362,7 +380,7 @@ namespace QR_Code_Tool.VievModels
                 {
                     this.selectedItems.Remove(item);
                 }
-            }           
+            }
         }
 
         public void Row_DoubleClick()
@@ -377,12 +395,12 @@ namespace QR_Code_Tool.VievModels
         }
 
         private void ShowLoginWindow(string client_ID, string return_URL)
-        {    
+        {
             this.loginWindow = new LoginWindow(client_ID, return_URL);
-            this.loginWindow.AuthCompleted += this.OnAuthorizeCompleted;           
+            this.loginWindow.AuthCompleted += this.OnAuthorizeCompleted;
             this.loginWindow.ShowDialog();
         }
-        
+
         private void ChangeVisibilityOfProgressBar(Visibility visibility, bool isIndeterminate = true)
         {
             this.dispatcher.BeginInvoke(new Action(() => { this.IsProressVisibility = visibility; }));
@@ -412,8 +430,8 @@ namespace QR_Code_Tool.VievModels
             {
                 return this.isProressVisibility;
             }
-            set 
-            {                        
+            set
+            {
                 this.isProressVisibility = value;
                 this.OnPropertyChanged("IsProressVisibility");
             }
