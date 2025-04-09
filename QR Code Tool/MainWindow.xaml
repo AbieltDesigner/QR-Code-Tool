@@ -41,25 +41,25 @@
 
         <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoggedIn}">
 
-            <Button Style="{StaticResource imageButtonStyle}" ToolTip="Назад" Click="back_Click">
+            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickBack}" ToolTip="Назад">
                 <Button.Content>
                     <Image Source="pack://siteoforigin:,,,/Resources/gui_back.png"/>
                 </Button.Content>
             </Button>
 
-            <Button Style="{StaticResource imageButtonStyle}" ToolTip="Обратно" Click="goUp_Click">
+            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickGoUp}" ToolTip="Обратно">
                 <Button.Content>
                     <Image Source="pack://siteoforigin:,,,/Resources/gui_undo.png"/>
                 </Button.Content>
             </Button>
 
-            <Button Style="{StaticResource imageButtonStyle}" ToolTip="Обновить" Click="refresh_Click">
+            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickRefresh}" ToolTip="Обновить">
                 <Button.Content>
                     <Image Source="pack://siteoforigin:,,,/Resources/gui_refresh.png"/>
                 </Button.Content>
             </Button>
 
-            <Button Style="{StaticResource imageButtonStyle}" ToolTip="В домашнюю дирректорию" Click="home_Click">
+            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickHome}" ToolTip="В домашнюю дирректорию">
                 <Button.Content>
                     <Image Source="pack://siteoforigin:,,,/Resources/gui_home.png"/>
                     </Button.Content>
@@ -87,51 +87,34 @@
             </DataGrid.Columns>
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Обновить"          Click="refresh_Click"></MenuItem>
-                    <MenuItem Header="Создать ссылку"    Click="publish_Click"></MenuItem>
-                    <MenuItem Header="Удалить ссылку"    Click="unpublish_Click"></MenuItem>
-                    <MenuItem Header="Копировать ссылку" Click="copiLink_Click"></MenuItem>
-                    <MenuItem Header="Печать QR"         Click="printQR_Click"></MenuItem>
+                    <MenuItem Header="Обновить"          Command="{Binding ClickRefresh}"></MenuItem>
+                    <MenuItem Header="Печать QR"         Command="{Binding ClickPrintQR}"></MenuItem>                   
+                    <MenuItem Header="Создать ссылку"    Command="{Binding ClickPublish}"></MenuItem>
+                    <MenuItem Header="Удалить ссылку"    Command="{Binding ClickUnPublish}"></MenuItem>
+                    <MenuItem Header="Копировать ссылку" Command="{Binding ClickCopiLink}"></MenuItem>
+                    <MenuItem Header="Удалить файл"      Command="{Binding ClickDeleteFile}"></MenuItem>
+
                 </ContextMenu>
             </DataGrid.ContextMenu>           
         </DataGrid>
 
-        <DockPanel  Grid.Row="3" VerticalAlignment="Bottom" IsEnabled="{Binding IsLoggedIn}" HorizontalAlignment="Left">        
-            <Button Style="{StaticResource buttonStyle}" Content="Печать QR" Click="printQR_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку" Click="publish_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку" Click="unpublish_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку"  Click="copiLink_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Загрузить файлы" Click="upLoadFile_Click" Width="110" />
-            <Button Style="{StaticResource buttonStyle}" Content="Удалить файлы" Click="deleteFile_Click" Width="110" />
+        <DockPanel  Grid.Row="3" VerticalAlignment="Bottom" IsEnabled="{Binding IsLoggedIn}" HorizontalAlignment="Left">
+            <Button Style="{StaticResource buttonStyle}" Content="Печать QR"         Command="{Binding ClickPrintQR}" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Создать ссылку"    Command="{Binding ClickPublish}" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку"    Command="{Binding ClickUnPublish}" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Command="{Binding ClickCopiLink}" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Загрузить файлы"   Command="{Binding ClickUpLoadFile}" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Удалить файлы"     Command="{Binding ClickDeleteFile}" Width="110" />
         </DockPanel>
         
         <StackPanel Grid.Row="2" VerticalAlignment="Center">
-            <ProgressBar Name="progressBar" IsIndeterminate="True" Width="550" Height="20" Margin="25,0,0,0" Visibility="Collapsed"/>
+            <ProgressBar IsIndeterminate="True" Width="550" Height="20" Margin="25,0,0,0" Visibility="{Binding IsProressVisibility}"/>
         </StackPanel>
 
         <DockPanel Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedIn}" HorizontalAlignment="Right" Content="Logout" Click="logOut_Click" />
-            <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedOut}" HorizontalAlignment="Right" Content="Login" Click="login_Click" />
-        </DockPanel>  
-        
-
-
-        <!--<Popup Name="popupNewFolder" StaysOpen="False" Placement="Center" MaxWidth="250" PopupAnimation="Scroll" IsOpen="False">
-            <Border Style="{StaticResource popupBorderStyle}">
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <TextBox Name="txtNewFolderName" Text="NewFolder" Width="150"/>                  
-                </StackPanel>
-            </Border>
-        </Popup>
-
-        <Popup x:Name="popupLink" StaysOpen="False" Placement="Center" PopupAnimation="Scroll" IsOpen="False">
-            <Border Style="{StaticResource popupBorderStyle}">
-                <StackPanel Name="linkPanel" Width="260" Height="75">
-                    <TextBlock Text="Link copied to clipboard" FontSize="20" HorizontalAlignment="Center"/>
-                    <TextBox x:Name="txtLink" Width="250" Height="25" Margin="0,10,0,0"/>
-                </StackPanel>
-            </Border>
-        </Popup>-->
+            <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedIn}"  Command="{Binding ClickLogOut}" HorizontalAlignment="Right" Content="Logout" />
+            <Button Style="{StaticResource buttonStyle}" IsEnabled="{Binding IsLoggedOut}" Command="{Binding ClickLogIn}" HorizontalAlignment="Right" Content="Login"  />
+        </DockPanel>         
 
     </Grid>
 </Window>

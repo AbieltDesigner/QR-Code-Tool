@@ -41,15 +41,7 @@ namespace QR_Code_Tool
             }
             this.Close();
         }
-
-        public void ClearAll()
-        {
-            nsICookieManager CookieMan;
-            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
-            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
-            CookieMan.RemoveAll();
-        }
-
+       
         public void AuthorizeAsync(IBrowser browser, string clientId, string returnUrl, EventHandler<GenericSdkEventArgs<string>> completeCallback)
         {             
             retUrl = returnUrl;
