@@ -92,8 +92,6 @@
                     <MenuItem Header="Создать ссылку"    Command="{Binding ClickPublish}"></MenuItem>
                     <MenuItem Header="Удалить ссылку"    Command="{Binding ClickUnPublish}"></MenuItem>
                     <MenuItem Header="Копировать ссылку" Command="{Binding ClickCopiLink}"></MenuItem>
-                    <MenuItem Header="Удалить файл"      Command="{Binding ClickDeleteFile}"></MenuItem>
-
                 </ContextMenu>
             </DataGrid.ContextMenu>           
         </DataGrid>
@@ -104,6 +102,7 @@
             <Button Style="{StaticResource buttonStyle}" Content="Удалить ссылку"    Command="{Binding ClickUnPublish}" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Kопировать ссылку" Command="{Binding ClickCopiLink}" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Загрузить файлы"   Command="{Binding ClickUpLoadFile}" Width="110" />
+            <Button Style="{StaticResource buttonStyle}" Content="Загрузить папку"   Command="{Binding ClickUpLoadFolder}" Width="110" />
             <Button Style="{StaticResource buttonStyle}" Content="Удалить файлы"     Command="{Binding ClickDeleteFile}" Width="110" />
         </DockPanel>
         

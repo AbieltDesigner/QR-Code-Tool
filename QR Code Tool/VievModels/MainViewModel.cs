@@ -1,11 +1,4 @@
-﻿using Gecko;
-using Microsoft.Win32;
-using QR_Code_Tool.API;
-using QR_Code_Tool.Metods;
-using QR_Code_Tool.SDK;
-using QR_Code_Tool.Serializable;
-using QR_Code_Tool.Serializable.Entity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,6 +11,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Gecko;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using QR_Code_Tool.API;
+using QR_Code_Tool.Metods;
+using QR_Code_Tool.SDK;
+using QR_Code_Tool.Serializable;
+using QR_Code_Tool.Serializable.Entity;
+using QR_Code_Tool.UserVariable;
+using YandexDisk.Client;
 using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool.VievModels
@@ -49,6 +52,7 @@ namespace QR_Code_Tool.VievModels
         private ICommand _clickUnPublish;
         private ICommand _clickCopiLink;
         private ICommand _clickUpLoadFile;
+        private ICommand _clickUpLoadFolder;
         private ICommand _clickDeleteFile;
         private ICommand _clickLogOut;
         private ICommand _clickLogIn;
@@ -75,11 +79,11 @@ namespace QR_Code_Tool.VievModels
         }
         public ICommand ClickPublish
         {
-            get { return _clickPublish ?? (_clickPublish = new CommandHandler(() => GoPublish())); }
+            get { return _clickPublish ?? (_clickPublish = new CommandHandler(async () => await Publish())); }
         }
         public ICommand ClickUnPublish
         {
-            get { return _clickUnPublish ?? (_clickUnPublish = new CommandHandler(() => GoUnPublish())); }
+            get { return _clickUnPublish ?? (_clickUnPublish = new CommandHandler(async () => await UnPublish())); }
         }
         public ICommand ClickCopiLink
         {
@@ -87,11 +91,15 @@ namespace QR_Code_Tool.VievModels
         }
         public ICommand ClickUpLoadFile
         {
-            get { return _clickUpLoadFile ?? (_clickUpLoadFile = new CommandHandler(() => GoUpLoadFile())); }
+            get { return _clickUpLoadFile ?? (_clickUpLoadFile = new CommandHandler(async () => await UpLoadFile())); }
+        }
+        public ICommand ClickUpLoadFolder
+        {
+            get { return _clickUpLoadFolder ?? (_clickUpLoadFolder = new CommandHandler(async () => await UpLoadFolder())); }
         }
         public ICommand ClickDeleteFile
         {
-            get { return _clickDeleteFile ?? (_clickDeleteFile = new CommandHandler(() => GoDeleteFile())); }
+            get { return _clickDeleteFile ?? (_clickDeleteFile = new CommandHandler(async () => await DeleteFile())); }
         }
         public ICommand ClickLogOut
         {
@@ -101,11 +109,10 @@ namespace QR_Code_Tool.VievModels
         {
             get { return _clickLogIn ?? (_clickLogIn = new CommandHandler(() => LogIn())); }
         }
-
         public MainViewModel(Dispatcher dispatcher)
         {
             this.dispatcher = dispatcher;
-            this.jsonFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
+            this.jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             this.appSettingsDeserialize = new AppSettingsDeserialize(jsonFilePath);
             this.appSettings = appSettingsDeserialize.GetSettingsModels();
             this.Client_ID = appSettings.ClientSettings.clientId;
@@ -158,74 +165,10 @@ namespace QR_Code_Tool.VievModels
             var printZPL = new PrintZPL(selectedItems.AsEnumerable(), appSettings.PrintSettings);
             printZPL.Print();
         }
-        private void GoPublish()
-        {
-            _ = Publish(this.currentPath);
-        }
-        private void GoUnPublish()
-        {
-            _ = UnPublish(this.currentPath);
-        }
-        private void CopiLink()
-        {
-            try
-            {
-                var rowDataDisk = selectedItems.FirstOrDefault();
-                if (rowDataDisk.PublicUrl == null)
-                {
-                    MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-                else
-                {
-                    System.Windows.Clipboard.SetText(rowDataDisk.PublicUrl);
-                    MessageBox.Show("Ссылка скопирована в буфер обмена.", "Удачно", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
-            }
 
-            catch (ArgumentNullException ex)
-            {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
-            }
-        }
-        private void GoUpLoadFile()
+        private async Task Publish()
         {
-            _ = UpLoadFile();
-        }
-        private void GoDeleteFile()
-        {
-            _ = DeleteFile(this.currentPath);
-        }
-        private void LogOut()
-        {
-            nsICookieManager CookieMan;
-            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
-            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
-            CookieMan.RemoveAll();
-
-            this.FolderItems = null;
-            this.currentPath = string.Empty;
-            AccessToken = string.Empty;
-
-            this.currentPath = string.Empty;
-            AccessToken = string.Empty;
-            this.OnPropertyChanged("IsLoggedIn");
-            this.OnPropertyChanged("IsLoggedOut");
-        }
-        private void LogIn()
-        {
-            AccessToken = string.Empty;
-            this.FolderItems = null;
-            this.currentPath = string.Empty;
-            this.OnPropertyChanged("IsLoggedIn");
-            this.ShowLoginWindow(Client_ID, Return_URL);
-        }
-
-        private async Task Publish(string currentPath)
-        {
+            var currentPath = this.currentPath;
             try
             {
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
@@ -255,8 +198,9 @@ namespace QR_Code_Tool.VievModels
                 _ = this.InitFolder(this.currentPath);
             }
         }
-        private async Task UnPublish(string currentPath)
+        private async Task UnPublish()
         {
+            var currentPath = this.currentPath;
             try
             {
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
@@ -286,8 +230,34 @@ namespace QR_Code_Tool.VievModels
                 _ = this.InitFolder(this.currentPath);
             }
         }
+
+        private void CopiLink()
+        {
+            try
+            {
+                var rowDataDisk = selectedItems.FirstOrDefault();
+                if (rowDataDisk.PublicUrl == null)
+                {
+                    MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                else
+                {
+                    System.Windows.Clipboard.SetText(rowDataDisk.PublicUrl);
+                    MessageBox.Show("Ссылка скопирована в буфер обмена.", "Удачно", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+
+            catch (ArgumentNullException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+        }
         private async Task UpLoadFile()
-        {            
+        {
             var openDialog = new OpenFileDialog();
             openDialog.Multiselect = true;
 
@@ -298,21 +268,26 @@ namespace QR_Code_Tool.VievModels
 
                 foreach (Stream stream in streams)
                 {
-                    FileStream fs = stream as FileStream;
-                    if (fs != null)
-                    {                  
-                        var fileName = System.IO.Path.GetFileName(fs.Name);
-                        var filePath = this.currentPath + "/" + fileName;
+                    FileStream fileStream = stream as FileStream;
+                    if (fileStream != null)
+                    {
+                        var fileName = Path.GetFileName(fileStream.Name);
+                        var filePath = Path.Combine(this.currentPath, fileName).Replace('\\', '/');
+
                         await semaphoreSlim.WaitAsync();
                         try
                         {
                             await this.yandexClient.UpLoadFileAsync(filePath, stream);
                         }
+                        catch (YandexApiException)
+                        {
+                            MessageBox.Show("Произошла ошибка при загрузке файла. Проверьте, возможно уже есть файл с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                         finally
                         {
                             semaphoreSlim.Release();
                         }
-                    }                 
+                    }
                 }
             }
             else
@@ -321,8 +296,86 @@ namespace QR_Code_Tool.VievModels
             }
             _ = this.InitFolder(this.currentPath);
         }
-              
-        private async Task DeleteFile(string currentPath)
+
+        private async Task UpLoadFolder()
+        {
+            CommonOpenFileDialog openDialog = new CommonOpenFileDialog();
+            openDialog.IsFolderPicker = true;
+
+            if (openDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                string selectedFolder = openDialog.FileName;
+                var listFilesItem = TreeScan(selectedFolder);
+
+                HashSet<string> uniqueFolderName = new HashSet<string>();
+                foreach (var folders in listFilesItem)
+                {
+                    uniqueFolderName.Add(folders.FolderName);
+                }
+
+                foreach (var folders in uniqueFolderName)
+                {
+                    var folderName = folders.Remove(0, folders.IndexOf(Path.GetFileName(selectedFolder), StringComparison.InvariantCulture)).Replace('\\', '/');
+                    var folderPath = Path.Combine(this.currentPath, folderName).Replace('\\', '/');
+                    await semaphoreSlim.WaitAsync();
+                    try
+                    {
+                        await this.yandexClient.CreateFolderAsync(folderPath);
+                    }
+                    catch (YandexApiException)
+                    {
+                        MessageBox.Show("Произошла ошибка при создании папки. Проверьте, возможно уже есть папка с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    finally
+                    {
+                        semaphoreSlim.Release();
+                    }
+                }
+
+                foreach (var fileItem in listFilesItem)
+                {
+                    using (FileStream fileStream = new FileStream(fileItem.FileName, FileMode.OpenOrCreate))
+                    {
+                        var currentFileName = fileItem.FileName.Remove(0, fileItem.FileName.IndexOf(Path.GetFileName(selectedFolder), StringComparison.InvariantCulture)).Replace('\\', '/');
+                        var filePath = Path.Combine(this.currentPath, currentFileName).Replace('\\', '/');
+                        await semaphoreSlim.WaitAsync();
+                        try
+                        {
+                            await this.yandexClient.UpLoadFileAsync(filePath, fileStream);
+                        }
+                        catch (YandexApiException)
+                        {
+                            MessageBox.Show("Произошла ошибка при загрузке файла. Проверьте, возможно уже есть файл с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    }
+                }
+            }
+            foldersItem.Clear();
+            _ = this.InitFolder(this.currentPath);
+        }
+
+        List<FolderItems> foldersItem = new List<FolderItems>();
+
+        private List<FolderItems> TreeScan(string sDir)
+        {
+
+            foreach (string file in Directory.GetFiles(sDir))
+            {
+                foldersItem.Add(new FolderItems(sDir, file));
+            }
+            foreach (string d in Directory.GetDirectories(sDir))
+            {
+                TreeScan(d);
+            }
+            return foldersItem;
+        }
+
+        private async Task DeleteFile()
         {
             MessageBoxResult result = MessageBox.Show(
                 "Удалить выбранные файлы?",
@@ -331,6 +384,7 @@ namespace QR_Code_Tool.VievModels
                 MessageBoxImage.Information);
             if (result == MessageBoxResult.Yes)
             {
+                var currentPath = this.currentPath;
                 try
                 {
                     var collectionRows = selectedItems.AsEnumerable<Resource>();
@@ -360,6 +414,31 @@ namespace QR_Code_Tool.VievModels
                     _ = this.InitFolder(this.currentPath);
                 }
             }
+        }
+
+        private void LogOut()
+        {
+            nsICookieManager CookieMan;
+            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
+            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
+            CookieMan.RemoveAll();
+
+            this.FolderItems = null;
+            this.currentPath = string.Empty;
+            AccessToken = string.Empty;
+
+            this.currentPath = string.Empty;
+            AccessToken = string.Empty;
+            this.OnPropertyChanged("IsLoggedIn");
+            this.OnPropertyChanged("IsLoggedOut");
+        }
+        private void LogIn()
+        {
+            AccessToken = string.Empty;
+            this.FolderItems = null;
+            this.currentPath = string.Empty;
+            this.OnPropertyChanged("IsLoggedIn");
+            this.ShowLoginWindow(Client_ID, Return_URL);
         }
 
         public void GridItems_SelectionChanged(SelectionChangedEventArgs e)
@@ -486,4 +565,3 @@ namespace QR_Code_Tool.VievModels
         }
     }
 }
-

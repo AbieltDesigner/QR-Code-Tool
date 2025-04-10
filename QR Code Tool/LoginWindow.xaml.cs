@@ -1,10 +1,10 @@
-﻿using Gecko;
+﻿using System;
+using System.Windows;
+using System.Windows.Forms.Integration;
+using Gecko;
 using QR_Code_Tool.Provider;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.SDK.Utils;
-using System;
-using System.Windows;
-using System.Windows.Forms.Integration;
 
 namespace QR_Code_Tool
 {
@@ -12,7 +12,7 @@ namespace QR_Code_Tool
     /// Логика взаимодействия для Loggin.xaml
     /// </summary>
     public partial class LoginWindow : Window
-    {     
+    {
         private static string retUrl;
         private GeckoWebBrowser browser;
         private static EventHandler<GenericSdkEventArgs<string>> completeHandler;
@@ -28,7 +28,7 @@ namespace QR_Code_Tool
             GridWeb.Children.Add(host);
         }
 
-        public LoginWindow(string clientID, string returnURL):this()
+        public LoginWindow(string clientID, string returnURL) : this()
         {
             AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
         }
@@ -41,9 +41,9 @@ namespace QR_Code_Tool
             }
             this.Close();
         }
-       
+
         public void AuthorizeAsync(IBrowser browser, string clientId, string returnUrl, EventHandler<GenericSdkEventArgs<string>> completeCallback)
-        {             
+        {
             retUrl = returnUrl;
             completeHandler = completeCallback;
             var authUrl = string.Format(WebdavResources.AuthBrowserUrlFormat, clientId);
@@ -60,7 +60,7 @@ namespace QR_Code_Tool
         {
             if (e.Result.Contains(retUrl))
             {
-                var token = ResponseParser.ParseToken(e.Result);                                                               
+                var token = ResponseParser.ParseToken(e.Result);
                 completeHandler.SafeInvoke(sender, new GenericSdkEventArgs<string>(token));
             }
         }

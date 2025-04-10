@@ -1,6 +1,6 @@
-﻿using QR_Code_Tool.Serializable.Entity;
+﻿using System.IO;
 using Newtonsoft.Json;
-using System.IO;
+using QR_Code_Tool.Serializable.Entity;
 
 namespace QR_Code_Tool.Serializable
 {

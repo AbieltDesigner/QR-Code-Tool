@@ -29,20 +29,20 @@ namespace QR_Code_Tool.API
         }
 
         public async Task<Resource> GetListFilesToFolderAsync(string currentPath)
-        {           
+        {
             string filePath = $@"disk:/" + $"{currentPath}";
-            return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath });          
+            return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath });
         }
 
         public async Task GetFileInfoAsync(string folderPath, string filePath)
-        {          
+        {
             string fullPath = $@"disk:/" + $"{folderPath}" + "/" + $"{filePath}";
             await diskHttpApi.Files.GetDownloadLinkAsync(fullPath);
         }
 
         public async Task<Link> PublishFolderOrFileAsync(string filePath)
         {
-            return await diskHttpApi.MetaInfo.PublishFolderAsync(filePath);         
+            return await diskHttpApi.MetaInfo.PublishFolderAsync(filePath);
         }
 
         public async Task<Link> UnPublishFolderOrFileAsync(string filePath)
@@ -52,14 +52,19 @@ namespace QR_Code_Tool.API
 
         public async Task DeleteFileAsync(string filePath)
         {
-            var deleteFileRequest = new DeleteFileRequest() 
-                { Path = (filePath), Permanently = false };
+            var deleteFileRequest = new DeleteFileRequest()
+            { Path = (filePath), Permanently = false };
             await diskHttpApi.Commands.DeleteAsync(deleteFileRequest);
         }
 
         public async Task UpLoadFileAsync(string filePath, Stream file)
         {
             await diskHttpApi.Files.UploadFileAsync(filePath, false, file);
+        }
+
+        public async Task CreateFolderAsync(string folderPath)
+        {
+            await diskHttpApi.Commands.CreateDictionaryAsync(folderPath);
         }
     }
 }

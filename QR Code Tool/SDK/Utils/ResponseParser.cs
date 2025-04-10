@@ -2,10 +2,7 @@
  * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
  */
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;

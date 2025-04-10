@@ -8,7 +8,7 @@ namespace QR_Code_Tool.VievModels
 {
     public interface IMainViewModel
     {
-        ICommand ClickBack { get; }       
+        ICommand ClickBack { get; }
         ICommand ClickGoUp { get; }
         ICommand ClickRefresh { get; }
         ICommand ClickHome { get; }

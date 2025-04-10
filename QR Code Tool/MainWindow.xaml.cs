@@ -13,17 +13,17 @@ namespace QR_Code_Tool
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {   
+    {
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
         private readonly IMainViewModel mainViewModel;
 
         public MainWindow()
         {
             InitializeComponent();
-            mainViewModel = new MainViewModel(Dispatcher);          
+            mainViewModel = new MainViewModel(Dispatcher);
             DataContext = mainViewModel;
-        }         
-         
+        }
+
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             mainViewModel.GridItems_SelectionChanged(e);
@@ -32,7 +32,7 @@ namespace QR_Code_Tool
         private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             mainViewModel.Row_DoubleClick();
-        }          
-                            
+        }
+
     }
 }
