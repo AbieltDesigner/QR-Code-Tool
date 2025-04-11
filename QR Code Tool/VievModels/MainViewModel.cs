@@ -58,55 +58,81 @@ namespace QR_Code_Tool.VievModels
 
         public ICommand ClickBack
         {
-            get { return _clickBack ?? (_clickBack = new CommandHandler(() => Back())); }
+            get { return _clickBack ?? (_clickBack = new CommandHandler(
+                async() =>
+                await Back())); }
         }
         public ICommand ClickGoUp
         {
-            get { return _clickGoUp ?? (_clickGoUp = new CommandHandler(() => Up())); }
+            get { return _clickGoUp ?? (_clickGoUp = new CommandHandler(
+                async () =>
+                await Up())); }
         }
         public ICommand ClickRefresh
         {
-            get { return _clickRefresh ?? (_clickRefresh = new CommandHandler(() => Refresh())); }
+            get { return _clickRefresh ?? (_clickRefresh = new CommandHandler(
+                async () =>
+                await Refresh())); }
         }
         public ICommand ClickHome
         {
-            get { return _clickHome ?? (_clickHome = new CommandHandler(() => Home())); }
+            get { return _clickHome ?? (_clickHome = new CommandHandler(
+                async () =>
+                await Home())); }
         }
         public ICommand ClickPrintQR
         {
-            get { return _clickPrintQR ?? (_clickPrintQR = new CommandHandler(() => PrintQR())); }
+            get { return _clickPrintQR ?? (_clickPrintQR = new CommandHandler(
+                () => 
+                PrintQR())); }
         }
         public ICommand ClickPublish
         {
-            get { return _clickPublish ?? (_clickPublish = new CommandHandler(async () => await Publish())); }
+            get { return _clickPublish ?? (_clickPublish = new CommandHandler(
+                async () =>
+                await Publish(selectedItems.AsEnumerable<Resource>()))); }
         }
         public ICommand ClickUnPublish
         {
-            get { return _clickUnPublish ?? (_clickUnPublish = new CommandHandler(async () => await UnPublish())); }
+            get { return _clickUnPublish ?? (_clickUnPublish = new CommandHandler(
+                async () =>
+                await UnPublish(selectedItems.AsEnumerable<Resource>()))); }
         }
         public ICommand ClickCopiLink
         {
-            get { return _clickCopiLink ?? (_clickCopiLink = new CommandHandler(() => CopiLink())); }
+            get { return _clickCopiLink ?? (_clickCopiLink = new CommandHandler(
+                () =>
+                CopiLink())); }
         }
         public ICommand ClickUpLoadFile
         {
-            get { return _clickUpLoadFile ?? (_clickUpLoadFile = new CommandHandler(async () => await UpLoadFile())); }
+            get { return _clickUpLoadFile ?? (_clickUpLoadFile = new CommandHandler(
+                async () =>
+                await UpLoadFile())); }
         }
         public ICommand ClickUpLoadFolder
         {
-            get { return _clickUpLoadFolder ?? (_clickUpLoadFolder = new CommandHandler(async () => await UpLoadFolder())); }
+            get { return _clickUpLoadFolder ?? (_clickUpLoadFolder = new CommandHandler(
+                async () =>
+                await UpLoadFolder())); }
         }
         public ICommand ClickDeleteFile
         {
-            get { return _clickDeleteFile ?? (_clickDeleteFile = new CommandHandler(async () => await DeleteFile())); }
+            get { return _clickDeleteFile ?? (_clickDeleteFile = new CommandHandler(
+                async () =>
+                await DeleteFile())); }
         }
         public ICommand ClickLogOut
         {
-            get { return _clickLogOut ?? (_clickLogOut = new CommandHandler(() => LogOut())); }
+            get { return _clickLogOut ?? (_clickLogOut = new CommandHandler(
+                () =>
+                LogOut())); }
         }
         public ICommand ClickLogIn
         {
-            get { return _clickLogIn ?? (_clickLogIn = new CommandHandler(() => LogIn())); }
+            get { return _clickLogIn ?? (_clickLogIn = new CommandHandler(
+                () =>
+                LogIn())); }
         }
         public MainViewModel(Dispatcher dispatcher)
         {
@@ -128,36 +154,40 @@ namespace QR_Code_Tool.VievModels
                 this.currentPath = path;
                 this.yandexClient = new YandexAPI(AccessToken);
                 var resource = await this.yandexClient.GetListFilesToFolderAsync(currentPath);
-                _ = this.dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items); }));
+                await this.dispatcher.BeginInvoke(new Action(() => { this.FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items); }));
                 this.OnPropertyChanged("FolderPath");
                 this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
             }
         }
 
-        private void Back()
+        private async Task Back()
         {
             var delimeterIndex = this.currentPath.Length > 1 ? this.currentPath.LastIndexOf("/", this.currentPath.Length - 2) : 0;
             if (delimeterIndex > 0)
             {
+                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 var topPath = this.currentPath.Substring(0, delimeterIndex);
                 this.previousPath = this.currentPath;
-                _ = this.InitFolder(topPath);
+                await this.InitFolder(topPath);
             }
         }
-        private void Up()
+        private async Task Up()
         {
+            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
             var previous = this.previousPath;
             this.previousPath = this.currentPath;
-            _ = this.InitFolder(previous);
+            await this.InitFolder(previous);
         }
-        private void Home()
+        private async Task Home()
         {
+            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
             this.previousPath = this.currentPath;
-            _ = this.InitFolder(homePath);
+            await this.InitFolder(homePath);
         }
-        private void Refresh()
+        private async Task Refresh()
         {
-            _ = this.InitFolder(this.currentPath);
+            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+            await this.InitFolder(this.currentPath);
         }
         private void PrintQR()
         {
@@ -165,18 +195,19 @@ namespace QR_Code_Tool.VievModels
             printZPL.Print();
         }
 
-        private async Task Publish()
+        private async Task Publish(IEnumerable<Resource> collectionRows)
         {
             var currentPath = this.currentPath;
             try
             {
-                var collectionRows = selectedItems.AsEnumerable<Resource>();
+                var localCollectionRows = collectionRows.ToList<Resource>();
+
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
 
                 var sw = new Stopwatch();
                 sw.Start();
 
-                foreach (var rowDataDisk in collectionRows)
+                foreach (var rowDataDisk in localCollectionRows)
                 {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
                     {
@@ -205,14 +236,15 @@ namespace QR_Code_Tool.VievModels
                 _ = this.InitFolder(this.currentPath);
             }
         }
-        private async Task UnPublish()
+        private async Task UnPublish(IEnumerable<Resource> collectionRows)
         {
             var currentPath = this.currentPath;
             try
             {
-                var collectionRows = selectedItems.AsEnumerable<Resource>();
+                var localCollectionRows = collectionRows.ToList<Resource>();
+                
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-                foreach (var rowDataDisk in collectionRows)
+                foreach (var rowDataDisk in localCollectionRows)
                 {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
                     {
