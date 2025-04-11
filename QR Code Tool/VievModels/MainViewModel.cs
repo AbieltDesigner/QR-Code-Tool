@@ -25,7 +25,6 @@ using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool.VievModels
 {
-
     public class MainViewModel : INotifyPropertyChanged, IMainViewModel
     {
         private IYandexAPI yandexClient;
@@ -35,7 +34,7 @@ namespace QR_Code_Tool.VievModels
         private string currentPath, previousPath;
         private readonly string homePath;
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(3, 3);
         private readonly string jsonFilePath;
         private readonly AppSettingsDeserialize appSettingsDeserialize;
         private readonly AppSettings appSettings;
@@ -173,6 +172,10 @@ namespace QR_Code_Tool.VievModels
             {
                 var collectionRows = selectedItems.AsEnumerable<Resource>();
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+
+                var sw = new Stopwatch();
+                sw.Start();
+
                 foreach (var rowDataDisk in collectionRows)
                 {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
@@ -188,6 +191,10 @@ namespace QR_Code_Tool.VievModels
                         }
                     }
                 }
+
+                sw.Stop();
+                Debug.WriteLine(sw.ElapsedMilliseconds); // Здесь логируем
+
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -307,14 +314,8 @@ namespace QR_Code_Tool.VievModels
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 string selectedFolder = openDialog.FileName;
                 var listFilesItem = TreeScan(selectedFolder);
-
-                HashSet<string> uniqueFolderName = new HashSet<string>();
-                foreach (var folders in listFilesItem)
-                {
-                    uniqueFolderName.Add(folders.FolderName);
-                }
-
-                foreach (var folders in uniqueFolderName)
+                                
+                foreach (var folders in FolderUserData.uniqueFolderName)
                 {
                     var folderName = folders.Remove(0, folders.IndexOf(Path.GetFileName(selectedFolder), StringComparison.InvariantCulture)).Replace('\\', '/');
                     var folderPath = Path.Combine(this.currentPath, folderName).Replace('\\', '/');
@@ -332,6 +333,8 @@ namespace QR_Code_Tool.VievModels
                         semaphoreSlim.Release();
                     }
                 }
+
+                FolderUserData.uniqueFolderName.Clear();                
 
                 foreach (var fileItem in listFilesItem)
                 {
@@ -353,20 +356,20 @@ namespace QR_Code_Tool.VievModels
                             semaphoreSlim.Release();
                         }
                     }
-                }
+                }            
             }
             foldersItem.Clear();
             _ = this.InitFolder(this.currentPath);
         }
 
-        List<FolderItems> foldersItem = new List<FolderItems>();
+        List<FolderUserData> foldersItem = new List<FolderUserData>();
 
-        private List<FolderItems> TreeScan(string sDir)
+        private List<FolderUserData> TreeScan(string sDir)
         {
 
             foreach (string file in Directory.GetFiles(sDir))
             {
-                foldersItem.Add(new FolderItems(sDir, file));
+                foldersItem.Add(new FolderUserData(sDir, file));
             }
             foreach (string d in Directory.GetDirectories(sDir))
             {

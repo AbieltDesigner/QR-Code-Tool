@@ -164,7 +164,7 @@
     <Compile Include="Serializable\Entity\IClientSettings.cs" />
     <Compile Include="Serializable\Entity\IPrintSettings.cs" />
     <Compile Include="Serializable\Entity\PrintSettings.cs" />
-    <Compile Include="UserVariable\FolderItems.cs" />
+    <Compile Include="UserVariable\FolderUserData.cs" />
     <Compile Include="VievModels\IMainViewModel.cs" />
     <Compile Include="VievModels\MainViewModel.cs" />
     <Compile Include="VievModels\CommandHandler.cs" />
