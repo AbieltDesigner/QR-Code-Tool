@@ -63,6 +63,16 @@ namespace QR_Code_Tool.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AbieltLogo {
+            get {
+                object obj = ResourceManager.GetObject("AbieltLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap gui_back {
             get {
                 object obj = ResourceManager.GetObject("gui_back", resourceCulture);
@@ -96,6 +106,16 @@ namespace QR_Code_Tool.Properties {
         internal static System.Drawing.Bitmap gui_undo {
             get {
                 object obj = ResourceManager.GetObject("gui_undo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap QRCode {
+            get {
+                object obj = ResourceManager.GetObject("QRCode", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="QR_Code_Tool.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LoginWindow" Height="650" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Авторизация" Height="650" Width="800" WindowStartupLocation="CenterScreen" Style="{StaticResource styleWindow}">
     <Grid 
         Name="GridWeb">
     </Grid>

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Forms.Integration;
+using System.Windows.Input;
 using Gecko;
 using QR_Code_Tool.Provider;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.SDK.Utils;
+using QR_Code_Tool.VievModels;
 
 namespace QR_Code_Tool
 {
@@ -16,6 +18,16 @@ namespace QR_Code_Tool
         private static string retUrl;
         private GeckoWebBrowser browser;
         private static EventHandler<GenericSdkEventArgs<string>> completeHandler;
+        private ICommand _clickClose;
+        public ICommand ClickClose
+        {
+            get
+            {
+                return _clickClose ?? (_clickClose = new CommandHandler(
+                () =>
+                CloseWindow()));
+            }
+        }
 
         public LoginWindow()
         {
@@ -26,6 +38,7 @@ namespace QR_Code_Tool
             host.Child = browser;
             this.browser = browser;
             GridWeb.Children.Add(host);
+            DataContext = this;
         }
 
         public LoginWindow(string clientID, string returnURL) : this()
@@ -63,6 +76,11 @@ namespace QR_Code_Tool
                 var token = ResponseParser.ParseToken(e.Result);
                 completeHandler.SafeInvoke(sender, new GenericSdkEventArgs<string>(token));
             }
+        }
+
+        private void CloseWindow()
+        {
+            this.Close();
         }
 
         public event EventHandler<GenericSdkEventArgs<string>> AuthCompleted;

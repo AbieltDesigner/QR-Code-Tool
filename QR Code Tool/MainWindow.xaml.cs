@@ -34,5 +34,6 @@ namespace QR_Code_Tool
             mainViewModel.Row_DoubleClick();
         }
 
+
     }
 }

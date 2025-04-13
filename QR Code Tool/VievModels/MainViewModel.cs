@@ -55,6 +55,7 @@ namespace QR_Code_Tool.VievModels
         private ICommand _clickDeleteFile;
         private ICommand _clickLogOut;
         private ICommand _clickLogIn;
+        private ICommand _clickClose;
 
         public ICommand ClickBack
         {
@@ -134,6 +135,16 @@ namespace QR_Code_Tool.VievModels
                 () =>
                 LogIn())); }
         }
+        public ICommand ClickClose
+        {
+            get
+            {
+                return _clickClose ?? (_clickClose = new CommandHandler(
+                () =>
+                CloseApp()));
+            }
+        }
+
         public MainViewModel(Dispatcher dispatcher)
         {
             this.dispatcher = dispatcher;
@@ -141,7 +152,7 @@ namespace QR_Code_Tool.VievModels
             this.appSettingsDeserialize = new AppSettingsDeserialize(jsonFilePath);
             this.appSettings = appSettingsDeserialize.GetSettingsModels();
             this.Client_ID = appSettings.ClientSettings.clientId;
-            this.Return_URL = @"http://" + appSettings.ClientSettings.returnUrl;
+            this.Return_URL = string.Concat(@"http://", appSettings.ClientSettings.returnUrl);
             this.homePath = appSettings.FolderSettings.HomeFolder;
             this.ShowLoginWindow(Client_ID, Return_URL);
             _ = InitFolder(homePath);
@@ -161,12 +172,12 @@ namespace QR_Code_Tool.VievModels
         }
 
         private async Task Back()
-        {
+        {       
             var delimeterIndex = this.currentPath.Length > 1 ? this.currentPath.LastIndexOf("/", this.currentPath.Length - 2) : 0;
             if (delimeterIndex > 0)
             {
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-                var topPath = this.currentPath.Substring(0, delimeterIndex);
+                var topPath = this.currentPath.Substring(0, delimeterIndex + 1);
                 this.previousPath = this.currentPath;
                 await this.InitFolder(topPath);
             }
@@ -202,10 +213,7 @@ namespace QR_Code_Tool.VievModels
             {
                 var localCollectionRows = collectionRows.ToList<Resource>();
 
-                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
-
-                var sw = new Stopwatch();
-                sw.Start();
+                this.ChangeVisibilityOfProgressBar(Visibility.Visible);                             
 
                 foreach (var rowDataDisk in localCollectionRows)
                 {
@@ -214,7 +222,7 @@ namespace QR_Code_Tool.VievModels
                         await semaphoreSlim.WaitAsync();
                         try
                         {
-                            await this.yandexClient.PublishFolderOrFileAsync(currentPath + "/" + rowDataDisk.Name);
+                            await this.yandexClient.PublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
                         }
                         finally
                         {
@@ -222,10 +230,6 @@ namespace QR_Code_Tool.VievModels
                         }
                     }
                 }
-
-                sw.Stop();
-                Debug.WriteLine(sw.ElapsedMilliseconds); // Здесь логируем
-
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -251,7 +255,7 @@ namespace QR_Code_Tool.VievModels
                         await semaphoreSlim.WaitAsync();
                         try
                         {
-                            await this.yandexClient.UnPublishFolderOrFileAsync(currentPath + "/" + rowDataDisk.Name);
+                            await this.yandexClient.UnPublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
                         }
                         finally
                         {
@@ -275,6 +279,8 @@ namespace QR_Code_Tool.VievModels
             try
             {
                 var rowDataDisk = selectedItems.FirstOrDefault();
+                if (rowDataDisk == null)
+                    return;
                 if (rowDataDisk.PublicUrl == null)
                 {
                     MessageBox.Show("Публичная ссылка не сформирована, ее необходимо сначала сформировать", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -285,6 +291,12 @@ namespace QR_Code_Tool.VievModels
                     MessageBox.Show("Ссылка скопирована в буфер обмена.", "Удачно", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
+
+            catch (NullReferenceException ex)
+            {
+                Debug.WriteLine($"Произошло исключение {ex.Message}");
+            }
+
             catch (ArgumentOutOfRangeException ex)
             {
                 Debug.WriteLine($"Произошло исключение {ex.Message}");
@@ -476,6 +488,11 @@ namespace QR_Code_Tool.VievModels
             this.ShowLoginWindow(Client_ID, Return_URL);
         }
 
+        private void CloseApp()
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
         public void GridItems_SelectionChanged(SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
@@ -503,7 +520,7 @@ namespace QR_Code_Tool.VievModels
             if (rowDataDisk.Type is ResourceType.Dir)
             {
                 previousPath = currentPath;
-                currentPath = currentPath + "/" + rowDataDisk.Name;
+                currentPath = string.Concat (currentPath, rowDataDisk.Name, "/");
                 _ = InitFolder(currentPath);
             }
         }

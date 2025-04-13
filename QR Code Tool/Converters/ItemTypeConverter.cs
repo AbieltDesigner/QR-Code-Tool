@@ -7,11 +7,17 @@ namespace QR_Code_Tool.Converters
     public class ItemTypeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (string.IsNullOrEmpty(value.ToString()))
+        {        
+            if (value is YandexDisk.Client.Protocol.ResourceType.Dir)
             {
-                return "directory";
+                return "Папка";
             }
+
+            if (value is YandexDisk.Client.Protocol.ResourceType.File)
+            {
+                return "Файл";
+            }
+            
             return value;
         }
 
