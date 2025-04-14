@@ -54,7 +54,7 @@ namespace QR_Code_Tool.SDK.Utils
         /// <returns>The parsed access token.</returns>
         public static string ParseToken(string resultString)
         {
-            var parseToken = "y0__" + Regex.Match(resultString, WebdavResources.TokenRegexPattern).Value;
+            var parseToken = Regex.Match(resultString, WebdavResources.TokenRegexPattern).Value;
             return parseToken;
         }
     }

@@ -115,7 +115,7 @@ namespace QR_Code_Tool.SDK.Utils {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ([a-zA-Z0-9]){53}.
+        ///   Ищет локализованную строку, похожую на ([a-zA-Z0-9_-]){57}.
         /// </summary>
         internal static string TokenRegexPattern {
             get {

@@ -136,6 +136,6 @@
     <value>Can't load SDK provider assembly. Add reference to the platform specific assembly 'Disk.SDK.Provider (platform)' and try again.</value>
   </data>
   <data name="TokenRegexPattern" xml:space="preserve">
-    <value>([a-zA-Z0-9]){53}</value>
+    <value>([a-zA-Z0-9_-]){57}</value>
   </data>
 </root>
