@@ -32,12 +32,12 @@ namespace QR_Code_Tool
         public LoginWindow()
         {
             InitializeComponent();
-            Xpcom.Initialize("Firefox");
+            Xpcom.Initialize("Firefox64");
             WindowsFormsHost host = new WindowsFormsHost();
             GeckoWebBrowser browser = new GeckoWebBrowser();
             host.Child = browser;
             this.browser = browser;
-            GridWeb.Children.Add(host);
+            GridWeb.Children.Add(host);        
             DataContext = this;
         }
 

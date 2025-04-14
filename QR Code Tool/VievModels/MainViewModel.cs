@@ -539,6 +539,8 @@ namespace QR_Code_Tool.VievModels
 
         private void OnAuthorizeCompleted(object sender, GenericSdkEventArgs<string> e)
         {
+            if (!string.IsNullOrEmpty(AccessToken))
+                return;
             if (e.Error == null)
             {
                 AccessToken = e.Result;
