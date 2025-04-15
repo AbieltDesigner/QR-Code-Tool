@@ -83,9 +83,69 @@ namespace QR_Code_Tool.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap gui_back_isDisabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_back_isDisabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_back_isEnabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_back_isEnabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_back_isMouseOver {
+            get {
+                object obj = ResourceManager.GetObject("gui_back_isMouseOver", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap gui_home {
             get {
                 object obj = ResourceManager.GetObject("gui_home", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_home_isDisabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_home_isDisabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_home_isEnabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_home_isEnabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_home_isMouseOver {
+            get {
+                object obj = ResourceManager.GetObject("gui_home_isMouseOver", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +163,69 @@ namespace QR_Code_Tool.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap gui_undo {
+        internal static System.Drawing.Bitmap gui_refresh_isDisabled {
             get {
-                object obj = ResourceManager.GetObject("gui_undo", resourceCulture);
+                object obj = ResourceManager.GetObject("gui_refresh_isDisabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_refresh_isEnabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_refresh_isEnabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_refresh_isMouseOver {
+            get {
+                object obj = ResourceManager.GetObject("gui_refresh_isMouseOver", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_up {
+            get {
+                object obj = ResourceManager.GetObject("gui_up", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_up_isDisabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_up_isDisabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_up_isEnabled {
+            get {
+                object obj = ResourceManager.GetObject("gui_up_isEnabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap gui_up_isMouseOver {
+            get {
+                object obj = ResourceManager.GetObject("gui_up_isMouseOver", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

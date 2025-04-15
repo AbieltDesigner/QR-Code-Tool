@@ -31,7 +31,7 @@ namespace QR_Code_Tool.API
         public async Task<Resource> GetListFilesToFolderAsync(string currentPath)
         {
             string filePath = currentPath;
-            return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath });
+            return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath, Limit = 100 });
         }
 
         public async Task GetFileInfoAsync(string folderPath, string filePath)

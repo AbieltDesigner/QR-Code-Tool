@@ -1,7 +1,7 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converters="clr-namespace:QR_Code_Tool.Converters"        
+        xmlns:converters="clr-namespace:QR_Code_Tool.Converters"
         xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="QR_Code_Tool.MainWindow"        
         Title="Программа формирования кодов QR" Height="600" Width="1000" 
         Icon="pack://application:,,,/Resources/AbieltLogo.png"
@@ -10,34 +10,23 @@
 
     <Window.Resources>
         <converters:ItemTypeConverter x:Key="itemTypeConverter"/>
-        <converters:ItemSizeConverter x:Key="itemSizeConverter"/>     
+        <converters:ItemSizeConverter x:Key="itemSizeConverter"/>      
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-           
+            <RowDefinition Height="40"/>           
             <RowDefinition/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoggedIn}">
 
-            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickBack}" ToolTip="Назад">
-                <Image Source="/Resources/gui_back.png"/>
-            </Button>
+            <Button Style="{StaticResource backButton}" Command="{Binding ClickBack}" ToolTip="Назад"/>
+            <Button Style="{StaticResource upButton}" Command="{Binding ClickGoUp}" ToolTip="Обратно"/>
+            <Button Style="{StaticResource refreshButton}" Command="{Binding ClickRefresh}" ToolTip="Обновить"/>
+            <Button Style="{StaticResource homeButton}" Command="{Binding ClickHome}" ToolTip="В домашнюю дирректорию"/>
 
-            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickGoUp}" ToolTip="Обратно">
-                <Image Source="pack://application:,,,/Resources/gui_undo.png"/>
-            </Button>
-
-            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickRefresh}" ToolTip="Обновить">
-                <Image Source="pack://application:,,,/Resources/gui_refresh.png"/>
-            </Button>
-
-            <Button Style="{StaticResource imageButtonStyle}" Command="{Binding ClickHome}" ToolTip="В домашнюю дирректорию">
-                <Image Source="pack://application:,,,/Resources/gui_home.png"/>
-            </Button>
             <TextBox IsReadOnly="True" Margin="10,0,0,0" TextWrapping="Wrap" Text="{Binding Path=FolderPath, Mode=OneWay}" Height="22" Width="800" FontSize="13"/>
 
         </StackPanel>

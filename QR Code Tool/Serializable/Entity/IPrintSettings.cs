@@ -2,7 +2,7 @@
 {
     public interface IPrintSettings
     {
-        string ComPort { get; set; }
+        string PrintName { get; set; }
         int SizeFont { get; set; }
     }
 }

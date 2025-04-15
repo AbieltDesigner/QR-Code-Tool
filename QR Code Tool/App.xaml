@@ -3,9 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:QR_Code_Tool"
              StartupUri="MainWindow.xaml">
-    <Application.Resources>
-
-        <ResourceDictionary>
+    <Application.Resources>  
+        <ResourceDictionary>                       
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/StyleDictionary.xaml" />              
             </ResourceDictionary.MergedDictionaries>
