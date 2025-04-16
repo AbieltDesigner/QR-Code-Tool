@@ -212,24 +212,29 @@ namespace QR_Code_Tool.VievModels
             try
             {
                 var localCollectionRows = collectionRows.ToList<Resource>();
-
-                this.ChangeVisibilityOfProgressBar(Visibility.Visible);                             
-
+                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                var tasks = new List<Task>();
+                             
                 foreach (var rowDataDisk in localCollectionRows)
                 {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl == null)
                     {
                         await semaphoreSlim.WaitAsync();
-                        try
+
+                        tasks.Add(Task.Run(async () =>
                         {
-                            await this.yandexClient.PublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
-                        }
-                        finally
-                        {
-                            semaphoreSlim.Release();
-                        }
-                    }
+                            try
+                            {
+                                await this.yandexClient.PublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
+                            }
+                            finally
+                            {
+                                semaphoreSlim.Release();
+                            }
+                        }));
+                    }                                                                                  
                 }
+                await Task.WhenAll(tasks);              
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -245,24 +250,30 @@ namespace QR_Code_Tool.VievModels
             var currentPath = this.currentPath;
             try
             {
-                var localCollectionRows = collectionRows.ToList<Resource>();
-                
+                var localCollectionRows = collectionRows.ToList<Resource>();                
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                var tasks = new List<Task>();
+
                 foreach (var rowDataDisk in localCollectionRows)
                 {
                     if (rowDataDisk.Name != null && rowDataDisk.PublicUrl != null)
                     {
                         await semaphoreSlim.WaitAsync();
-                        try
+
+                        tasks.Add(Task.Run(async () =>
                         {
-                            await this.yandexClient.UnPublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
-                        }
-                        finally
-                        {
-                            semaphoreSlim.Release();
-                        }
-                    }
+                            try
+                            {
+                                await this.yandexClient.UnPublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
+                            }
+                            finally
+                            {
+                                semaphoreSlim.Release();
+                            }
+                        }));
+                    }                    
                 }
+                await Task.WhenAll(tasks);
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -316,6 +327,7 @@ namespace QR_Code_Tool.VievModels
             {
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 var streams = openDialog.OpenFiles();
+                var tasks = new List<Task>();
 
                 foreach (Stream stream in streams)
                 {
@@ -325,21 +337,24 @@ namespace QR_Code_Tool.VievModels
                         var fileName = Path.GetFileName(fileStream.Name);
                         var filePath = Path.Combine(this.currentPath, fileName).Replace('\\', '/');
 
-                        await semaphoreSlim.WaitAsync();
-                        try
+                        tasks.Add(Task.Run(async () =>
                         {
-                            await this.yandexClient.UpLoadFileAsync(filePath, stream);
-                        }
-                        catch (YandexApiException)
-                        {
-                            MessageBox.Show("Произошла ошибка при загрузке файла. Проверьте, возможно уже есть файл с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                        finally
-                        {
-                            semaphoreSlim.Release();
-                        }
-                    }
+                            try
+                            {
+                                await this.yandexClient.UpLoadFileAsync(filePath, stream);
+                            }
+                            catch (YandexApiException)
+                            {
+                                MessageBox.Show("Произошла ошибка при загрузке файла. Проверьте, возможно уже есть файл с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                            finally
+                            {
+                                semaphoreSlim.Release();
+                            }
+                        }));      
+                    }                    
                 }
+                await Task.WhenAll(tasks);
             }
             else
             {
@@ -358,25 +373,33 @@ namespace QR_Code_Tool.VievModels
                 this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 string selectedFolder = openDialog.FileName;
                 var listFilesItem = TreeScan(selectedFolder);
-                                
+
+                var tasks = new List<Task>();
+
                 foreach (var folders in FolderUserData.uniqueFolderName)
                 {
                     var folderName = folders.Remove(0, folders.IndexOf(Path.GetFileName(selectedFolder), StringComparison.InvariantCulture)).Replace('\\', '/');
                     var folderPath = Path.Combine(this.currentPath, folderName).Replace('\\', '/');
+
                     await semaphoreSlim.WaitAsync();
-                    try
+
+                    tasks.Add(Task.Run(async () =>
                     {
-                        await this.yandexClient.CreateFolderAsync(folderPath);
-                    }
-                    catch (YandexApiException)
-                    {
-                        MessageBox.Show("Произошла ошибка при создании папки. Проверьте, возможно уже есть папка с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                    finally
-                    {
-                        semaphoreSlim.Release();
-                    }
-                }
+                        try
+                        {
+                            await this.yandexClient.CreateFolderAsync(folderPath);
+                        }
+                        catch (YandexApiException)
+                        {
+                            MessageBox.Show("Произошла ошибка при создании папки. Проверьте, возможно уже есть папка с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    }));
+                }                
+                await Task.WhenAll(tasks);
 
                 FolderUserData.uniqueFolderName.Clear();                
 
@@ -387,20 +410,25 @@ namespace QR_Code_Tool.VievModels
                         var currentFileName = fileItem.FileName.Remove(0, fileItem.FileName.IndexOf(Path.GetFileName(selectedFolder), StringComparison.InvariantCulture)).Replace('\\', '/');
                         var filePath = Path.Combine(this.currentPath, currentFileName).Replace('\\', '/');
                         await semaphoreSlim.WaitAsync();
-                        try
+
+                        tasks.Add(Task.Run(async () =>
                         {
-                            await this.yandexClient.UpLoadFileAsync(filePath, fileStream);
-                        }
-                        catch (YandexApiException)
-                        {
-                            MessageBox.Show("Произошла ошибка при загрузке файла. Проверьте, возможно уже есть файл с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                        finally
-                        {
-                            semaphoreSlim.Release();
-                        }
+                            try
+                            {
+                                await this.yandexClient.UpLoadFileAsync(filePath, fileStream);
+                            }
+                            catch (YandexApiException)
+                            {
+                                MessageBox.Show("Произошла ошибка при загрузке файла. Проверьте, возможно уже есть файл с таким именем.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                            finally
+                            {
+                                semaphoreSlim.Release();
+                            }
+                        }));
                     }
-                }            
+                }
+                await Task.WhenAll(tasks);
             }
             foldersItem.Clear();
             _ = this.InitFolder(this.currentPath);
@@ -436,21 +464,28 @@ namespace QR_Code_Tool.VievModels
                 {
                     var collectionRows = selectedItems.AsEnumerable<Resource>();
                     this.ChangeVisibilityOfProgressBar(Visibility.Visible);
+                    var tasks = new List<Task>();
+
                     foreach (var rowDataDisk in collectionRows)
                     {
                         if (rowDataDisk.Name != null)
                         {
                             await semaphoreSlim.WaitAsync();
-                            try
+
+                            tasks.Add(Task.Run(async () =>
                             {
-                                await this.yandexClient.DeleteFileAsync(currentPath + "/" + rowDataDisk.Name);
-                            }
-                            finally
-                            {
-                                semaphoreSlim.Release();
-                            }
-                        }
+                                try
+                                {
+                                    await this.yandexClient.DeleteFileAsync(currentPath + "/" + rowDataDisk.Name);
+                                }
+                                finally
+                                {
+                                    semaphoreSlim.Release();
+                                }
+                            }));
+                        }                       
                     }
+                    await Task.WhenAll(tasks);
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {

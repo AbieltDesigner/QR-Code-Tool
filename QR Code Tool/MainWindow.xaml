@@ -39,7 +39,7 @@
                 </Style>                
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}"/>
                 <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="{x:Type DataGridCell}"/>
-
+                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}"/>               
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование"     Width="350" Binding="{Binding Name}"/>
