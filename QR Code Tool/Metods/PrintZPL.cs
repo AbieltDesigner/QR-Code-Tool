@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Windows;
 using BinaryKits.Zpl.Label;
 using BinaryKits.Zpl.Label.Elements;
 using QR_Code_Tool.Serializable.Entity;
@@ -93,7 +94,15 @@ namespace QR_Code_Tool.Metods
             {
                 // Открываем принтер
                 if (!OpenPrinter(printerName, out hPrinter, IntPtr.Zero))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                    try
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
+                    catch (Win32Exception)
+                    {
+                        MessageBox.Show($"Принтер {printerName} не установлен. Печать невозможна.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
 
                 // Начинаем документ
                 if (!StartDocPrinter(hPrinter, 1, ref di))

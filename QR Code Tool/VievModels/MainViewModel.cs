@@ -34,7 +34,7 @@ namespace QR_Code_Tool.VievModels
         private string currentPath, previousPath;
         private readonly string homePath;
         private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(3, 3);
+        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 3);
         private readonly string jsonFilePath;
         private readonly AppSettingsDeserialize appSettingsDeserialize;
         private readonly AppSettings appSettings;
@@ -337,6 +337,8 @@ namespace QR_Code_Tool.VievModels
                         var fileName = Path.GetFileName(fileStream.Name);
                         var filePath = Path.Combine(this.currentPath, fileName).Replace('\\', '/');
 
+                        await semaphoreSlim.WaitAsync();
+
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -476,7 +478,7 @@ namespace QR_Code_Tool.VievModels
                             {
                                 try
                                 {
-                                    await this.yandexClient.DeleteFileAsync(currentPath + "/" + rowDataDisk.Name);
+                                    await this.yandexClient.DeleteFileAsync(currentPath + rowDataDisk.Name);
                                 }
                                 finally
                                 {
