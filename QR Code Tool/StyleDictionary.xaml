@@ -165,10 +165,6 @@
         </Setter>
     </Style>
 
-
-
-
-
     <Style TargetType="{x:Type ScrollBar}">
         <Setter Property="Background" Value="{StaticResource ScorollBarBackgroundBrash}"/>
         <Setter Property="Template">
@@ -176,7 +172,7 @@
                 <ControlTemplate TargetType="{x:Type ScrollBar}">
                     <Grid
                         Background="{TemplateBinding Background}">
-                        <Track x:Name="PART_Track">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
                             <Track.Thumb>
                                 <Thumb>
                                     <Thumb.Style>

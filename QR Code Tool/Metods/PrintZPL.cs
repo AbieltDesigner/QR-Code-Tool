@@ -58,13 +58,26 @@ namespace QR_Code_Tool.Metods
                 var sampleText = item.Name;
                 var font = new ZplFont(fontWidth: printSettings.SizeFont, fontHeight: printSettings.SizeFont);
                 var elements = new List<ZplElementBase>();
-                elements.Add(new ZplTextField(sampleText, 50, 100, font));
-                elements.Add(new ZplQrCode(item.PublicUrl, 100, 200, 2, 12));
+                elements.Add(new ZplTextField(sampleText, StartTextPosition(sampleText), 30, font));
+
+                elements.Add(new ZplQrCode(item.PublicUrl, 180, 100, 2, 14));
+
                 var renderEngine = new ZplEngine(elements);
-                var zplContent = renderEngine.ToZplString(new ZplRenderOptions { AddEmptyLineBeforeElementStart = true });
-                System.Windows.Clipboard.SetText(zplContent);
+                var zplContent = renderEngine.ToZplString(new ZplRenderOptions { AddEmptyLineBeforeElementStart = true });       
+                //System.Windows.Clipboard.SetText(zplContent);
                 SendToPrinter(printSettings.PrintName, zplContent);                
             }
+        }
+
+        private static int StartTextPosition(string sampleText)
+        {
+            int realLength = sampleText.Length * 3;
+            double pole = (100 - realLength) / 2;
+            if(pole > 0)
+            {
+                return (int) pole * (740 / 100);
+            }
+            return 0;                                                 
         }
                
         private static void SendToPrinter(string printerName, string zplData)
@@ -91,7 +104,7 @@ namespace QR_Code_Tool.Metods
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 // Конвертируем данные в байты
-                byte[] bytes = System.Text.Encoding.ASCII.GetBytes(zplData);
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(zplData);
 
                 // Выделяем память и копируем данные
                 IntPtr pBytes = Marshal.AllocCoTaskMem(bytes.Length);
