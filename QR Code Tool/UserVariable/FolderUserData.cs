@@ -1,19 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace QR_Code_Tool.UserVariable
 {
     public class FolderUserData
     {
-        public string FolderName { get; set; }
+        public string FolderPath { get; set; }
         public string FileName { get; set; }
 
-        public static HashSet<string> uniqueFolderName = new HashSet<string>();
+        private static readonly ConcurrentDictionary<string, byte> uniqueFolders = new ConcurrentDictionary<string, byte>();
 
-        public FolderUserData(string folderName, string fileName)
+        // Метод для сброса списка (при необходимости)
+        public static void ResetUniqueFolders() => uniqueFolders.Clear();
+
+
+        // Статическое свойство для доступа к уникальным папкам
+        public static IReadOnlyCollection<string> UniqueFolders => uniqueFolders.Keys.OrderBy(folder => folder.Length).ToList();
+
+        public FolderUserData(string folderPath, string fileName)
         {
-            this.FolderName = folderName;
+            this.FolderPath = folderPath;
             this.FileName = fileName;
-            uniqueFolderName.Add(folderName);
+
+            if (!string.IsNullOrEmpty(folderPath))
+            {
+                var folder = Path.GetFullPath(folderPath);
+                uniqueFolders.TryAdd(folder, 0);
+            }
         }
     }
 }

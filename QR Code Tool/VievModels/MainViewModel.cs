@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -238,7 +237,7 @@ namespace QR_Code_Tool.VievModels
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
+                Logger.Instance.Log(ex);
             }
             finally
             {
@@ -277,7 +276,7 @@ namespace QR_Code_Tool.VievModels
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
+                Logger.Instance.Log(ex);
             }
             finally
             {
@@ -305,17 +304,17 @@ namespace QR_Code_Tool.VievModels
 
             catch (NullReferenceException ex)
             {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
+                Logger.Instance.Log(ex);
             }
 
             catch (ArgumentOutOfRangeException ex)
             {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
+                Logger.Instance.Log(ex);
             }
 
             catch (ArgumentNullException ex)
             {
-                Debug.WriteLine($"Произошло исключение {ex.Message}");
+                Logger.Instance.Log(ex);
             }
         }
 
@@ -357,7 +356,7 @@ namespace QR_Code_Tool.VievModels
                                 useAsync: true))
                             {
                                 var targetPath = Path.Combine(this.currentPath, Path.GetFileName(fileName))
-                                    .Replace('\\', '/');
+                                    .Replace(Path.DirectorySeparatorChar, '/');
 
                                 await this.yandexClient.UpLoadFileAsync(targetPath, fileStream)
                                     .ConfigureAwait(false);
@@ -367,6 +366,7 @@ namespace QR_Code_Tool.VievModels
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
+                                Logger.Instance.Log(ex);
                                 MessageBox.Show($"Ошибка загрузки файла {Path.GetFileName(fileName)}: {ex.Message}",
                                     "Ошибка загрузки",
                                     MessageBoxButton.OK,
@@ -377,6 +377,7 @@ namespace QR_Code_Tool.VievModels
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
+                                Logger.Instance.Log(ex);
                                 MessageBox.Show($"Ошибка обработки файла {Path.GetFileName(fileName)}: {ex.Message}",
                                     "Ошибка",
                                     MessageBoxButton.OK,
@@ -415,7 +416,7 @@ namespace QR_Code_Tool.VievModels
 
                     // Create all folders first
                     var folderTasks = new List<Task>();
-                    foreach (var folder in FolderUserData.uniqueFolderName)
+                    foreach (var folder in FolderUserData.UniqueFolders)
                     {
                         folderTasks.Add(Task.Run(async () =>
                         {
@@ -425,17 +426,18 @@ namespace QR_Code_Tool.VievModels
                                 string folderName = folder.Remove(0, folder.IndexOf(
                                     Path.GetFileName(selectedFolder),
                                     StringComparison.InvariantCulture))
-                                    .Replace('\\', '/');
+                                    .Replace(Path.DirectorySeparatorChar, '/');
 
                                 string targetPath = Path.Combine(this.currentPath, folderName)
-                                    .Replace('\\', '/');
+                                    .Replace(Path.DirectorySeparatorChar, '/');
 
                                 await this.yandexClient.CreateFolderAsync(targetPath);
                             }
-                            catch (YandexApiException)
+                            catch (YandexApiException ex)
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
+                                    Logger.Instance.Log(ex);
                                     MessageBox.Show("Ошибка создания папки. Возможно, она уже существует.",
                                         "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                                 });
@@ -447,7 +449,7 @@ namespace QR_Code_Tool.VievModels
                         }));
                     }
                     await Task.WhenAll(folderTasks);
-                    FolderUserData.uniqueFolderName.Clear();
+                    FolderUserData.ResetUniqueFolders();
 
                     // Upload all files
                     var fileTasks = new List<Task>();
@@ -465,15 +467,16 @@ namespace QR_Code_Tool.VievModels
                                         fileItem.FileName.Remove(0, fileItem.FileName.IndexOf(
                                             Path.GetFileName(selectedFolder),
                                             StringComparison.InvariantCulture))
-                                        .Replace('\\', '/'));
+                                        .Replace(Path.DirectorySeparatorChar, '/'));
 
                                     await this.yandexClient.UpLoadFileAsync(targetPath, fileStream);
                                 }
                             }
-                            catch (YandexApiException)
+                            catch (YandexApiException ex)
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
+                                    Logger.Instance.Log(ex);
                                     MessageBox.Show("Ошибка загрузки файла. Возможно, он уже существует.",
                                         "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                                 });
@@ -489,27 +492,30 @@ namespace QR_Code_Tool.VievModels
                 finally
                 {
                     this.ChangeVisibilityOfProgressBar(Visibility.Collapsed);
-                }
-
-                foldersItem.Clear();
+                }      
+                
                 await this.InitFolderAsync(this.currentPath);
             }
         }
 
-        List<FolderUserData> foldersItem = new List<FolderUserData>();
-
         private List<FolderUserData> TreeScan(string sDir)
         {
+            var result = new List<FolderUserData>();
+            ScanDirectory(sDir, result);
+            return result;
+        }
 
-            foreach (string file in Directory.GetFiles(sDir))
+        private void ScanDirectory(string dir, List<FolderUserData> result)
+        {
+            foreach (string file in Directory.GetFiles(dir))
             {
-                foldersItem.Add(new FolderUserData(sDir, file));
+                result.Add(new FolderUserData(dir, file));
             }
-            foreach (string d in Directory.GetDirectories(sDir))
-            {
-                TreeScan(d);
+
+            foreach (string subDir in Directory.GetDirectories(dir))
+            {                
+                ScanDirectory(subDir, result);
             }
-            return foldersItem;
         }
 
         private async Task DeleteFileAsync()
@@ -551,7 +557,7 @@ namespace QR_Code_Tool.VievModels
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    Debug.WriteLine($"Произошло исключение {ex.Message}");
+                    Logger.Instance.Log(ex);
                 }
                 finally
                 {
