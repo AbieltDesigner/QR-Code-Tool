@@ -283,7 +283,7 @@ namespace QR_Code_Tool.VievModels
                 await this.InitFolderAsync(this.currentPath);
             }
         }
-
+        //Review OK
         private void CopiLink()
         {
             try

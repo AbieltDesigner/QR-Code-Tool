@@ -56,17 +56,22 @@ namespace QR_Code_Tool.Metods
         {
             foreach (Resource item in items)
             {
-                var sampleText = item.Name;
-                var font = new ZplFont(fontWidth: printSettings.SizeFont, fontHeight: printSettings.SizeFont);
-                var elements = new List<ZplElementBase>();
-                elements.Add(new ZplTextField(sampleText, StartTextPosition(sampleText), 30, font));
-
-                elements.Add(new ZplQrCode(item.PublicUrl, 180, 100, 2, 14));
-
-                var renderEngine = new ZplEngine(elements);
-                var zplContent = renderEngine.ToZplString(new ZplRenderOptions { AddEmptyLineBeforeElementStart = true });       
-                //System.Windows.Clipboard.SetText(zplContent);
-                SendToPrinter(printSettings.PrintName, zplContent);                
+                if (item.PublicUrl != null)
+                {
+                    var sampleText = item.Name;
+                    var font = new ZplFont(fontWidth: printSettings.SizeFont, fontHeight: printSettings.SizeFont);
+                    var elements = new List<ZplElementBase>();
+                    elements.Add(new ZplTextField(sampleText, StartTextPosition(sampleText), 30, font));
+                    elements.Add(new ZplQrCode(item.PublicUrl, 190, 100, 2, 12));
+                    var renderEngine = new ZplEngine(elements);
+                    var zplContent = renderEngine.ToZplString(new ZplRenderOptions { AddEmptyLineBeforeElementStart = true });
+                    SendToPrinter(printSettings.PrintName, zplContent);
+                }
+                else
+                {
+                    MessageBox.Show($"Попытка распечатать без публичной ссылки.{Environment.NewLine} Публичная ссылка на каталог или файл {item.Name} не сформированна.", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
             }
         }
 
