@@ -103,9 +103,10 @@ namespace QR_Code_Tool.Metods
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
                     }
-                    catch (Win32Exception)
+                    catch (Win32Exception ex)
                     {
                         MessageBox.Show($"Принтер {printerName} не установлен. Печать невозможна.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Logger.Instance.Log(ex);
                         return;
                     }
 

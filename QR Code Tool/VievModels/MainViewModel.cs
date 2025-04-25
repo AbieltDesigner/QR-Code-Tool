@@ -159,6 +159,7 @@ namespace QR_Code_Tool.VievModels
 
         private async Task InitFolderAsync(string path)
         {
+            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
             if (!string.IsNullOrEmpty(AccessToken))
             {
                 this.currentPath = path;
@@ -175,7 +176,6 @@ namespace QR_Code_Tool.VievModels
             var delimeterIndex = this.currentPath.Length > 1 ? this.currentPath.LastIndexOf("/", this.currentPath.Length - 2) : 0;
             if (delimeterIndex > 0)
             {
-                this.ChangeVisibilityOfProgressBar(Visibility.Visible);
                 var topPath = this.currentPath.Substring(0, delimeterIndex + 1);
                 this.previousPath = this.currentPath;
                 await this.InitFolderAsync(topPath);
@@ -183,20 +183,17 @@ namespace QR_Code_Tool.VievModels
         }
         private async Task UpAsync()
         {
-            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
             var previous = this.previousPath;
             this.previousPath = this.currentPath;
             await this.InitFolderAsync(previous);
         }
         private async Task HomeAsync()
         {
-            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
             this.previousPath = this.currentPath;
             await this.InitFolderAsync(homePath);
         }
         private async Task RefreshAsync()
         {
-            this.ChangeVisibilityOfProgressBar(Visibility.Visible);
             await this.InitFolderAsync(this.currentPath);
         }
         private void PrintQR()

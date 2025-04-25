@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QR Code Tool", "QR Code Tool\QR Code Tool.csproj", "{013F86F2-44B1-41FD-8FEC-C32C2356661B}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupQRCodeTool", "SetupQRCodeTool\SetupQRCodeTool.vdproj", "{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,12 @@ Global
 		{013F86F2-44B1-41FD-8FEC-C32C2356661B}.Release|x64.Build.0 = Release|x64
 		{013F86F2-44B1-41FD-8FEC-C32C2356661B}.Release|x86.ActiveCfg = Release|x86
 		{013F86F2-44B1-41FD-8FEC-C32C2356661B}.Release|x86.Build.0 = Release|x86
+		{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}.Debug|Any CPU.ActiveCfg = Debug
+		{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}.Debug|x64.ActiveCfg = Debug
+		{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}.Debug|x86.ActiveCfg = Debug
+		{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}.Release|Any CPU.ActiveCfg = Release
+		{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}.Release|x64.ActiveCfg = Release
+		{F66D7BE6-E9DC-CCC6-FE0E-C0C3984438BE}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
