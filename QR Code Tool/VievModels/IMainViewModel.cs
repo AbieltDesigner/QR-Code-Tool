@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,5 +26,7 @@ namespace QR_Code_Tool.VievModels
 
         void GridItems_SelectionChanged(SelectionChangedEventArgs e);
         void Row_DoubleClick();
+
+        event EventHandler RequestClose;
     }
 }

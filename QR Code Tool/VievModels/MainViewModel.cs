@@ -593,7 +593,7 @@ namespace QR_Code_Tool.VievModels
 
         private void CloseApp()
         {
-            System.Windows.Application.Current.Shutdown();
+            RequestClose?.Invoke(this, EventArgs.Empty);
         }
 
         public void GridItems_SelectionChanged(SelectionChangedEventArgs e)
@@ -712,6 +712,8 @@ namespace QR_Code_Tool.VievModels
         {
             dispatcher.BeginInvoke(new Action(() => MessageBox.Show("SDK error: " + ex.Message)));
         }
+
+        public event EventHandler RequestClose;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

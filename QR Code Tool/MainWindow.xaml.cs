@@ -22,6 +22,7 @@ namespace QR_Code_Tool
             InitializeComponent();
             mainViewModel = new MainViewModel(Dispatcher);
             DataContext = mainViewModel;
+            mainViewModel.RequestClose += (s, e) => this.Close();
         }
 
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -33,7 +34,5 @@ namespace QR_Code_Tool
         {
             mainViewModel.Row_DoubleClick();
         }
-
-
     }
 }
