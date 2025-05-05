@@ -158,7 +158,7 @@ namespace QR_Code_Tool.VievModels
         }
 
         private async Task InitFolderAsync(string path)
-        {
+        {           
             if (!string.IsNullOrEmpty(AccessToken))
             {
                 this.currentPath = path;
