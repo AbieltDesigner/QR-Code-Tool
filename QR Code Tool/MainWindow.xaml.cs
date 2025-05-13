@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using QR_Code_Tool.Service;
 using QR_Code_Tool.VievModels;
 using YandexDisk.Client.Protocol;
 
@@ -20,7 +21,8 @@ namespace QR_Code_Tool
         public MainWindow()
         {
             InitializeComponent();
-            mainViewModel = new MainViewModel(Dispatcher);
+            var service = new WindowService(this);
+            mainViewModel = new MainViewModel(Dispatcher, service);
             DataContext = mainViewModel;
         }
 
@@ -33,7 +35,5 @@ namespace QR_Code_Tool
         {
             mainViewModel.Row_DoubleClick();
         }
-
-
     }
 }

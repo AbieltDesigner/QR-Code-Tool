@@ -18,6 +18,7 @@ using QR_Code_Tool.Metods;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.Serializable;
 using QR_Code_Tool.Serializable.Entity;
+using QR_Code_Tool.Service;
 using QR_Code_Tool.UserVariable;
 using YandexDisk.Client;
 using YandexDisk.Client.Protocol;
@@ -37,6 +38,8 @@ namespace QR_Code_Tool.VievModels
         private readonly string jsonFilePath;
         private readonly AppSettingsDeserialize appSettingsDeserialize;
         private readonly AppSettings appSettings;
+        private readonly IWindowService _windowService;
+
         public static string AccessToken { get; set; }
         private readonly string Client_ID;
         private readonly string Return_URL;
@@ -55,6 +58,8 @@ namespace QR_Code_Tool.VievModels
         private ICommand _clickLogOut;
         private ICommand _clickLogIn;
         private ICommand _clickClose;
+        private ICommand _pressEnter;
+        public ICommand CloseCommand { get; }
 
         public ICommand ClickBack
         {
@@ -144,9 +149,25 @@ namespace QR_Code_Tool.VievModels
             }
         }
 
-        public MainViewModel(Dispatcher dispatcher)
+        public ICommand PressEnter
+        {
+            get
+            {
+                return _pressEnter ?? (_pressEnter = new CommandHandler(
+                () =>
+                Row_DoubleClick()));
+            }
+        }
+
+
+
+
+        public MainViewModel(Dispatcher dispatcher, IWindowService windowService)
         {
             this.dispatcher = dispatcher;
+            _windowService = windowService;
+            CloseCommand = new CommandHandler(() => _windowService.Close());
+
             this.jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             this.appSettingsDeserialize = new AppSettingsDeserialize(jsonFilePath);
             this.appSettings = appSettingsDeserialize.GetSettingsModels();
@@ -590,7 +611,7 @@ namespace QR_Code_Tool.VievModels
 
         private void CloseApp()
         {
-            System.Windows.Application.Current.Shutdown();
+            CloseCommand.Execute(this);
         }
 
         public void GridItems_SelectionChanged(SelectionChangedEventArgs e)
