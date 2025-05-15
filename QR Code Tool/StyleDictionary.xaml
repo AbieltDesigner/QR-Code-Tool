@@ -1,0 +1,476 @@
+﻿
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="Color1">#FF161616</Color>
+    <Color x:Key="Color2">#FF212121</Color>
+    <Color x:Key="Color3">#FF2D2D2D</Color>
+    <Color x:Key="Color4">Red</Color>
+    <Color x:Key="Color5">#FFDD2591</Color>
+    <Color x:Key="Color6">White</Color>
+    <Color x:Key="Color7">#FF0011FF</Color>
+    <Color x:Key="Color8">#FFE6E6E6</Color>
+    <Color x:Key="Color9">#FF448FFF</Color>
+    <Color x:Key="Color10">Transparent</Color>
+    <Color x:Key="Color11">#FF373737</Color>
+
+    <Color x:Key="ProgressBarForegroundColor1">#FF0011FF</Color>
+    <Color x:Key="ProgressBarForegroundColor2">#FF30D9FF</Color>
+    <Color x:Key="ProgressBarBackgroundColor1">#FF141414</Color>
+    <Color x:Key="ProgressBarBackgroundColor2">White</Color>
+
+    <SolidColorBrush x:Key="WindowBackgroundBrash" Color="{StaticResource Color1}"/>
+    <SolidColorBrush x:Key="WindowHeadBrash" Color="{StaticResource Color2}"/>
+    <SolidColorBrush x:Key="CloseButtonBrash" Color="{StaticResource Color4}"/>
+    <SolidColorBrush x:Key="CloseButtonActiveBrash" Color="{StaticResource Color5}"/>
+    <SolidColorBrush x:Key="AppTitleBrash" Color="{StaticResource Color6}"/>
+    <SolidColorBrush x:Key="DataGridBorderBrush" Color="{StaticResource Color3}"/>
+    <SolidColorBrush x:Key="DataGridBackgroundBrash" Color="{StaticResource Color2}"/>
+    <SolidColorBrush x:Key="DataGridRowBackgroundBrash" Color="{StaticResource Color3}"/>
+    <SolidColorBrush x:Key="DataGridRowIsSelectedBackgroundBrash" Color="{StaticResource Color7}"/>
+    <SolidColorBrush x:Key="DataGridRowForegroundBrash" Color="{StaticResource Color6}"/>
+    <SolidColorBrush x:Key="ButtonsBackgroundBrash" Color="{StaticResource Color7}"/>
+    <SolidColorBrush x:Key="ButtonsForegroundBrash" Color="{StaticResource Color8}"/>
+    <SolidColorBrush x:Key="ButtonsIsMouseOverBackgroundBrash" Color="{StaticResource Color9}"/>
+    <SolidColorBrush x:Key="ButtonsIsDisableBackgroundBrash" Color="{StaticResource Color3}"/>
+    <SolidColorBrush x:Key="ImangeButtonsBackgroundBrash" Color="{StaticResource Color10}"/>    
+    <SolidColorBrush x:Key="ScorollBarBackgroundBrash" Color="{StaticResource Color1}"/>
+    <SolidColorBrush x:Key="ScorollBarTrumbBackgroundBrash" Color="{StaticResource Color3}"/>
+    <SolidColorBrush x:Key="ScorollBarTrumbActiveBackgroundBrash" Color="{StaticResource Color11}"/>
+
+    <!--Кнопка Close-->
+    <Style x:Key="closeButton" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Background" Value="{StaticResource CloseButtonBrash}"/>
+        <Setter Property="Margin" Value= "0,0,5,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="3,3,3,3">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource CloseButtonActiveBrash}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--Стиль основного окна с переорпеделением верхней полки и конпки Close-->
+    <Style x:Key="styleWindow" TargetType="{x:Type Window}">
+        <Setter Property="BorderBrush" Value="{StaticResource WindowHeadBrash}"/>
+        <Setter Property="Background" Value="{StaticResource WindowBackgroundBrash}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="10"/>   
+        
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome CaptionHeight="30"
+                              CornerRadius="4"
+                              GlassFrameThickness="0"
+                              NonClientFrameEdges="None"
+                              ResizeBorderThickness="5"
+                              UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>  
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Window}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="2,30,2,2">
+                            <AdornerDecorator>
+                                <ContentPresenter />
+                            </AdornerDecorator>
+                        </Border>
+
+                        <Grid Height="30"
+                            VerticalAlignment="Top">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Margin="5,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Foreground="{StaticResource AppTitleBrash}"
+                                       Text="{TemplateBinding Title}" 
+                                       Grid.Column="1"/>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <Button Style="{StaticResource closeButton}"
+                                        Command="{Binding ClickClose}"
+                                        Content="X"
+                                        WindowChrome.IsHitTestVisibleInChrome="True" />
+                            </StackPanel>
+                            
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>      
+    </Style>
+    
+    <!--Стиль основной таблицы DataGrid-->
+    <Style x:Key="dataGridStyle" TargetType="{x:Type DataGrid}">
+        <Setter Property="BorderBrush" Value="{StaticResource DataGridBorderBrush}"/>
+        <Setter Property="Background" Value="{StaticResource DataGridBackgroundBrash}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="Margin" Value="2,2,2,2"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible"/>
+    </Style>
+
+<!--Стили ячеек таблицы DataGridRow-->
+    <Style TargetType="{x:Type DataGridCell}">
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource DataGridRowIsSelectedBackgroundBrash}"/>               
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Background" Value="{StaticResource DataGridRowBackgroundBrash}"/>
+        <Setter Property="Foreground" Value="{StaticResource DataGridRowForegroundBrash}"/>        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                    <Border x:Name="border"
+             BorderBrush="#646464"
+             BorderThickness="1"                          
+             Background="{TemplateBinding Background}"
+             SnapsToDevicePixels="True">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="Focused" />
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CurrentStates">
+                                <VisualState x:Name="Regular" />
+                                <VisualState x:Name="Current"/>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ScrollBar}">
+        <Setter Property="Background" Value="{StaticResource ScorollBarBackgroundBrash}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid
+                        Background="{TemplateBinding Background}">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Style>
+                                        <Style TargetType="{x:Type Thumb}">
+                                            <Setter Property="Background" Value="{StaticResource ScorollBarTrumbBackgroundBrash}"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsDragging" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource ScorollBarTrumbActiveBackgroundBrash}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Thumb.Style>
+                                </Thumb>
+                            </Track.Thumb>
+                            <!--<Track.IncreaseRepeatButton>
+                                <RepeatButton 
+                                Command="ScrollBar.PageDownCommand" 
+                                Style="{StaticResource ScrollBarButton}"/>
+                            </Track.IncreaseRepeatButton>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton 
+                                Command="ScrollBar.PageUpCommand"
+                                Style="{StaticResource ScrollBarButton}"/>
+                            </Track.DecreaseRepeatButton>-->
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Стиль для кнопок повтора --><!--
+    <Style x:Key="ScrollBarButton" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Background" Value="#FF448FFF"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>-->
+
+    <!--Стиль основных кнопок-->
+    <Style x:Key="buttonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="110"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Background" Value="{StaticResource ButtonsBackgroundBrash}"/>
+        <Setter Property="Foreground" Value="{StaticResource ButtonsForegroundBrash}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="#141414" CornerRadius="3,3,3,3" BorderThickness="1,1,1,1">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>        
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource ButtonsIsMouseOverBackgroundBrash}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{StaticResource ButtonsIsDisableBackgroundBrash}" />
+            </Trigger>
+        </Style.Triggers>        
+    </Style>
+
+    <Style x:Key="imageButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="{StaticResource ImangeButtonsBackgroundBrash}"/>
+        <Setter Property="Margin" Value= "5,0,5,0"/>
+    </Style>
+
+    <!--Кнопка Home-->
+    <Style x:Key="homeButton" TargetType= "{x:Type Button}" BasedOn="{StaticResource imageButtonStyle}">
+        <!-- Обычный фон -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" 
+                         Background="{TemplateBinding Background}"
+                         Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- Триггеры для анимации -->
+                    <ControlTemplate.Triggers>
+                        <!-- При наведении курсора -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_home_isMouseOver.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- При нажатии -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_home_isEnabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- Не активна -->
+                        <Trigger Property="IsEnabled"  Value="False">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_home_isDisabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!-- Начальное изображение -->
+        <Setter Property="Background">
+            <Setter.Value>
+                <ImageBrush ImageSource="pack://application:,,,/Resources/gui_home.png"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--Кнопка Refresh-->
+    <Style x:Key="refreshButton" TargetType= "{x:Type Button}" BasedOn="{StaticResource imageButtonStyle}">
+        <!-- Обычный фон -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" 
+                      Background="{TemplateBinding Background}"
+                      Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- Триггеры для анимации -->
+                    <ControlTemplate.Triggers>
+                        <!-- При наведении курсора -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_refresh_isMouseOver.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- При нажатии -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_refresh_isEnabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- Не активна -->
+                        <Trigger Property="IsEnabled"  Value="False">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_refresh_isDisabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!-- Начальное изображение -->
+        <Setter Property="Background">
+            <Setter.Value>
+                <ImageBrush ImageSource="pack://application:,,,/Resources/gui_refresh.png"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--Кнопка Back-->
+    <Style x:Key="backButton" TargetType= "{x:Type Button}" BasedOn="{StaticResource imageButtonStyle}">
+        <!-- Обычный фон -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" 
+                   Background="{TemplateBinding Background}"
+                   Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- Триггеры для анимации -->
+                    <ControlTemplate.Triggers>
+                        <!-- При наведении курсора -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_back_isMouseOver.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- При нажатии -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_back_isEnabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- Не активна -->
+                        <Trigger Property="IsEnabled"  Value="False">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_back_isDisabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!-- Начальное изображение -->
+        <Setter Property="Background">
+            <Setter.Value>
+                <ImageBrush ImageSource="pack://application:,,,/Resources/gui_back.png"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!--Кнопка Up-->
+    <Style x:Key="upButton" TargetType= "{x:Type Button}" BasedOn="{StaticResource imageButtonStyle}">
+        <!-- Обычный фон -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" 
+                Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- Триггеры для анимации -->
+                    <ControlTemplate.Triggers>
+                        <!-- При наведении курсора -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_up_isMouseOver.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- При нажатии -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_up_isEnabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- Не активна -->
+                        <Trigger Property="IsEnabled"  Value="False">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="pack://application:,,,/Resources/gui_up_isDisabled.png"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!-- Начальное изображение -->
+        <Setter Property="Background">
+            <Setter.Value>
+                <ImageBrush ImageSource="pack://application:,,,/Resources/gui_up.png"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="progressBarStyle" TargetType="{x:Type ProgressBar}">
+        <Setter Property="Width" Value="550"/>
+        <Setter Property="Height" Value="20"/>   
+        <Setter Property="Margin" Value= "25,0,0,0"/>
+        <Setter Property="IsIndeterminate" Value= "True"/>
+        <Setter Property="Foreground">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="{StaticResource ProgressBarForegroundColor1}" Offset= "0"/>
+                    <GradientStop Color="{StaticResource ProgressBarForegroundColor2}" Offset="1"/>                   
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="{StaticResource ProgressBarBackgroundColor1}"/>
+                    <GradientStop Color="{StaticResource ProgressBarBackgroundColor2}" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>   
+    </Style>      
+  </ResourceDictionary>

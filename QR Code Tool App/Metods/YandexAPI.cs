@@ -1,0 +1,68 @@
+﻿using System.IO;
+using YandexDisk.Client.Clients;
+using YandexDisk.Client.Http;
+using YandexDisk.Client.Protocol;
+
+namespace QR_Code_Tool_App.Metods
+{
+    public class YandexAPI : IYandexAPI
+    {
+        private readonly string accessToken;
+
+        DiskHttpApi diskHttpApi;
+
+        public YandexAPI(string accessToken)
+        {
+            this.accessToken = accessToken;
+            diskHttpApi = new DiskHttpApi(accessToken);
+        }
+
+        /// <summary>
+        /// Пользовательский токен
+        /// </summary>
+        /// <value>The access token.</value>
+        public string AccessToken
+        {
+            get { return accessToken; }
+        }
+
+        public async Task<Resource> GetListFilesToFolderAsync(string currentPath)
+        {
+            string filePath = currentPath;
+            return await diskHttpApi.MetaInfo.GetInfoAsync(new ResourceRequest { Path = filePath, Limit = 2000 });
+        }
+
+        public async Task GetFileInfoAsync(string folderPath, string filePath)
+        {
+            string fullPath = string.Concat(folderPath, "/", filePath);
+            await diskHttpApi.Files.GetDownloadLinkAsync(fullPath);
+        }
+
+        public async Task<Link> PublishFolderOrFileAsync(string filePath)
+        {
+            return await diskHttpApi.MetaInfo.PublishFolderAsync(filePath);
+        }
+
+        public async Task<Link> UnPublishFolderOrFileAsync(string filePath)
+        {
+            return await diskHttpApi.MetaInfo.UnpublishFolderAsync(filePath);
+        }
+
+        public async Task DeleteFileAsync(string filePath)
+        {
+            var deleteFileRequest = new DeleteFileRequest()
+            { Path = filePath, Permanently = false };
+            await diskHttpApi.Commands.DeleteAsync(deleteFileRequest);
+        }
+
+        public async Task UpLoadFileAsync(string filePath, Stream file)
+        {
+            await diskHttpApi.Files.UploadFileAsync(filePath, false, file);
+        }
+
+        public async Task CreateFolderAsync(string folderPath)
+        {
+            await diskHttpApi.Commands.CreateDictionaryAsync(folderPath);
+        }
+    }
+}

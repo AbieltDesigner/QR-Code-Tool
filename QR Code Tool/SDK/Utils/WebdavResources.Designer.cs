@@ -88,24 +88,6 @@ namespace QR_Code_Tool.SDK.Utils {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на e44807741c564ca9bcbf3cb14ef20be5.
-        /// </summary>
-        internal static string ClientID {
-            get {
-                return ResourceManager.GetString("ClientID", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на 35090a02b8b3485cb632c57d8f337e8b.
-        /// </summary>
-        internal static string ClientSecret {
-            get {
-                return ResourceManager.GetString("ClientSecret", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на You must be logged in before starting to work with SDK, try to call AuthorizeAsync(...) at first.
         /// </summary>
         internal static string NotAuthorizedErrorMessage {
@@ -133,16 +115,7 @@ namespace QR_Code_Tool.SDK.Utils {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на http://127.0.0.1:130/test.
-        /// </summary>
-        internal static string ReturnURL {
-            get {
-                return ResourceManager.GetString("ReturnURL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на ([a-zA-Z0-9]){53}.
+        ///   Ищет локализованную строку, похожую на ([a-zA-Z0-9_-]){57}.
         /// </summary>
         internal static string TokenRegexPattern {
             get {

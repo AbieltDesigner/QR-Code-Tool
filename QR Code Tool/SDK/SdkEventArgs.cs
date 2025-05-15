@@ -3,7 +3,6 @@
  */
 
 using System;
-using System.Diagnostics;
 
 namespace QR_Code_Tool.SDK
 {

@@ -1,10 +1,12 @@
-﻿using Gecko;
+﻿using System;
+using System.Windows;
+using System.Windows.Forms.Integration;
+using System.Windows.Input;
+using Gecko;
 using QR_Code_Tool.Provider;
 using QR_Code_Tool.SDK;
 using QR_Code_Tool.SDK.Utils;
-using System;
-using System.Windows;
-using System.Windows.Forms.Integration;
+using QR_Code_Tool.VievModels;
 
 namespace QR_Code_Tool
 {
@@ -12,23 +14,34 @@ namespace QR_Code_Tool
     /// Логика взаимодействия для Loggin.xaml
     /// </summary>
     public partial class LoginWindow : Window
-    {     
+    {
         private static string retUrl;
         private GeckoWebBrowser browser;
         private static EventHandler<GenericSdkEventArgs<string>> completeHandler;
+        private ICommand _clickClose;
+        public ICommand ClickClose
+        {
+            get
+            {
+                return _clickClose ?? (_clickClose = new CommandHandler(
+                () =>
+                CloseWindow()));
+            }
+        }
 
         public LoginWindow()
         {
             InitializeComponent();
-            Xpcom.Initialize("Firefox");
+            Xpcom.Initialize("Firefox64");
             WindowsFormsHost host = new WindowsFormsHost();
             GeckoWebBrowser browser = new GeckoWebBrowser();
             host.Child = browser;
             this.browser = browser;
             GridWeb.Children.Add(host);
+            DataContext = this;
         }
 
-        public LoginWindow(string clientID, string returnURL):this()
+        public LoginWindow(string clientID, string returnURL) : this()
         {
             AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
         }
@@ -42,16 +55,8 @@ namespace QR_Code_Tool
             this.Close();
         }
 
-        public void ClearAll()
-        {
-            nsICookieManager CookieMan;
-            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
-            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
-            CookieMan.RemoveAll();
-        }
-
         public void AuthorizeAsync(IBrowser browser, string clientId, string returnUrl, EventHandler<GenericSdkEventArgs<string>> completeCallback)
-        {             
+        {
             retUrl = returnUrl;
             completeHandler = completeCallback;
             var authUrl = string.Format(WebdavResources.AuthBrowserUrlFormat, clientId);
@@ -68,9 +73,14 @@ namespace QR_Code_Tool
         {
             if (e.Result.Contains(retUrl))
             {
-                var token = ResponseParser.ParseToken(e.Result);                                                               
+                var token = ResponseParser.ParseToken(e.Result);
                 completeHandler.SafeInvoke(sender, new GenericSdkEventArgs<string>(token));
             }
+        }
+
+        private void CloseWindow()
+        {
+            this.Close();
         }
 
         public event EventHandler<GenericSdkEventArgs<string>> AuthCompleted;

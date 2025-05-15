@@ -5,20 +5,15 @@ namespace QR_Code_Tool.Serializable.Entity
     [Serializable]
     public class AppSettings
     {
-        //public FillingOutThePassportSettings Resources { get; set; }
-        //public CorrectFontSettings CorrectFontResources { get; set; }
-        //public FormSettings FormSettings { get; set; }
-        //public string GlobalDateBaseLocation { get; set; }
-        //public bool GlobalDateBaseLocationEnable { get; set; }
-        //public TypeNkySettings[] TypeNkySettings { get; set; }
+        public ClientSettings ClientSettings { get; set; }
+        public PrintSettings PrintSettings { get; set; }
+        public FolderSettings FolderSettings { get; set; }
 
-        public AppSettings(/*FillingOutThePassportSettings resources, CorrectFontSettings correctFontResources, FormSettings formSettings, string globalDateBaseLocation, TypeNkySettings[] typeNkySettings*/)
+        public AppSettings(ClientSettings сlientSettings, PrintSettings printSettings, FolderSettings folderSettings)
         {
-            //Resources = resources;
-            //CorrectFontResources = correctFontResources;
-            //FormSettings = formSettings;
-            //GlobalDateBaseLocation = globalDateBaseLocation;
-            //TypeNkySettings = typeNkySettings;
+            this.ClientSettings = сlientSettings;
+            this.PrintSettings = printSettings;
+            this.FolderSettings = folderSettings;
         }
     }
 }

@@ -2,10 +2,7 @@
  * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
  */
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -57,7 +54,7 @@ namespace QR_Code_Tool.SDK.Utils
         /// <returns>The parsed access token.</returns>
         public static string ParseToken(string resultString)
         {
-            var parseToken = "y0__" + Regex.Match(resultString, WebdavResources.TokenRegexPattern).Value;
+            var parseToken = Regex.Match(resultString, WebdavResources.TokenRegexPattern).Value;
             return parseToken;
         }
     }
