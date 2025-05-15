@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace QR_Code_Tool.Service
+namespace QR_Code_Tool_App.Service
 {
     public class WindowService : IWindowService
     {
