@@ -20,11 +20,11 @@ namespace QR_Code_Tool_App.VievModels
 {
     public class MainViewModel : INotifyPropertyChanged, IMainViewModel
     {
-        private IYandexAPI yandexClient;
-        private LoginWindow loginWindow;
-        private ObservableCollection<Resource> folderItems;
+        private IYandexAPI? yandexClient;
+        private LoginWindow? loginWindow;
+        private ObservableCollection<Resource>? folderItems;
         private Visibility isProressVisibility;
-        private string currentPath, previousPath;
+        private string? currentPath, previousPath;
         private readonly string homePath;
         private readonly ICollection<Resource> selectedItems = [];
         private readonly SemaphoreSlim semaphoreSlim = new(1, 3);
@@ -33,7 +33,7 @@ namespace QR_Code_Tool_App.VievModels
         private readonly AppSettings appSettings;
         private readonly IWindowService _windowService;
 
-        public string AccessToken { get; set; }
+        public static string? AccessToken { get; set; }
         private readonly string Client_ID;
         private readonly string Return_URL;
         private readonly Dispatcher dispatcher;
@@ -185,14 +185,11 @@ namespace QR_Code_Tool_App.VievModels
         {
             get
             {
-                return _pressEnter ?? (_pressEnter = new CommandHandler(
+                return _pressEnter ??= new CommandHandler(
                 () =>
-                Row_DoubleClick()));
+                Row_DoubleClick());
             }
         }
-
-
-
 
         public MainViewModel(Dispatcher dispatcher, IWindowService windowService)
         {
@@ -218,18 +215,18 @@ namespace QR_Code_Tool_App.VievModels
                 currentPath = path;
                 yandexClient = new YandexAPI(AccessToken);
                 var resource = await yandexClient.GetListFilesToFolderAsync(currentPath);
-                await dispatcher.BeginInvoke(new Action(() => { FolderItems = new ObservableCollection<Resource>(resource.Embedded.Items); }));
-                OnPropertyChanged("FolderPath");
+                await dispatcher.BeginInvoke(new Action(() => { FolderItems = [.. resource.Embedded.Items]; }));
+                OnPropertyChanged(nameof(FolderPath));
                 ChangeVisibilityOfProgressBar(Visibility.Collapsed);
             }
         }
 
         private async Task BackAsync()
         {
-            var delimeterIndex = currentPath.Length > 1 ? currentPath.LastIndexOf("/", currentPath.Length - 2) : 0;
+            var delimeterIndex = currentPath!.Length > 1 ? currentPath.LastIndexOf("/", currentPath.Length - 2) : 0;
             if (delimeterIndex > 0)
             {
-                var topPath = currentPath.Substring(0, delimeterIndex + 1);
+                var topPath = currentPath[..(delimeterIndex + 1)];
                 previousPath = currentPath;
                 await InitFolderAsync(topPath);
             }
@@ -238,7 +235,7 @@ namespace QR_Code_Tool_App.VievModels
         {
             var previous = previousPath;
             previousPath = currentPath;
-            await InitFolderAsync(previous);
+            await InitFolderAsync(previous!);
         }
         private async Task HomeAsync()
         {
@@ -247,7 +244,7 @@ namespace QR_Code_Tool_App.VievModels
         }
         private async Task RefreshAsync()
         {
-            await InitFolderAsync(currentPath);
+            await InitFolderAsync(currentPath!);
         }
         private void PrintQR()
         {
@@ -274,7 +271,8 @@ namespace QR_Code_Tool_App.VievModels
                         {
                             try
                             {
-                                await yandexClient.PublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
+                                if (yandexClient is not null)
+                                    await yandexClient.PublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
                             }
                             finally
                             {
@@ -291,7 +289,7 @@ namespace QR_Code_Tool_App.VievModels
             }
             finally
             {
-                await InitFolderAsync(this.currentPath);
+                await InitFolderAsync(this.currentPath!);
             }
         }
         private async Task UnPublishAsync(IEnumerable<Resource> collectionRows)
@@ -313,7 +311,8 @@ namespace QR_Code_Tool_App.VievModels
                         {
                             try
                             {
-                                await yandexClient.UnPublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
+                                if (yandexClient is not null)
+                                    await yandexClient.UnPublishFolderOrFileAsync(string.Concat(currentPath, rowDataDisk.Name));
                             }
                             finally
                             {
@@ -330,7 +329,7 @@ namespace QR_Code_Tool_App.VievModels
             }
             finally
             {
-                await InitFolderAsync(this.currentPath);
+                await InitFolderAsync(this.currentPath!);
             }
         }
         //Review OK
@@ -404,11 +403,11 @@ namespace QR_Code_Tool_App.VievModels
                                 FileShare.Read,
                                 bufferSize: 4096,
                                 useAsync: true);
-                            var targetPath = Path.Combine(currentPath, Path.GetFileName(fileName))
+                            var targetPath = Path.Combine(currentPath!, Path.GetFileName(fileName))
                                 .Replace(Path.DirectorySeparatorChar, '/');
 
-                            await yandexClient.UpLoadFileAsync(targetPath, fileStream)
-                                .ConfigureAwait(false);
+                            if (yandexClient is not null)
+                                await yandexClient.UpLoadFileAsync(targetPath, fileStream).ConfigureAwait(false);
                         }
                         catch (YandexApiException ex)
                         {
@@ -444,7 +443,7 @@ namespace QR_Code_Tool_App.VievModels
             finally
             {
                 ChangeVisibilityOfProgressBar(Visibility.Collapsed);
-                await InitFolderAsync(currentPath);
+                await InitFolderAsync(currentPath!);
             }
         }
 
@@ -474,10 +473,11 @@ namespace QR_Code_Tool_App.VievModels
                                     StringComparison.InvariantCulture))
                                     .Replace(Path.DirectorySeparatorChar, '/');
 
-                                string targetPath = Path.Combine(currentPath, folderName)
+                                string targetPath = Path.Combine(currentPath!, folderName)
                                     .Replace(Path.DirectorySeparatorChar, '/');
 
-                                await yandexClient.CreateFolderAsync(targetPath);
+                                if (yandexClient is not null)
+                                    await yandexClient.CreateFolderAsync(targetPath);
                             }
                             catch (YandexApiException ex)
                             {
@@ -508,13 +508,14 @@ namespace QR_Code_Tool_App.VievModels
                             {
                                 using var fileStream = new FileStream(
                                     fileItem.FileName, FileMode.Open, FileAccess.Read);
-                                string targetPath = Path.Combine(currentPath,
+                                string targetPath = Path.Combine(currentPath!,
                                     fileItem.FileName.Remove(0, fileItem.FileName.IndexOf(
                                         Path.GetFileName(selectedFolder),
                                         StringComparison.InvariantCulture))
                                     .Replace(Path.DirectorySeparatorChar, '/'));
 
-                                await yandexClient.UpLoadFileAsync(targetPath, fileStream);
+                                if (yandexClient is not null)
+                                    await yandexClient.UpLoadFileAsync(targetPath, fileStream);
                             }
                             catch (YandexApiException ex)
                             {
@@ -538,7 +539,7 @@ namespace QR_Code_Tool_App.VievModels
                     ChangeVisibilityOfProgressBar(Visibility.Collapsed);
                 }
 
-                await InitFolderAsync(currentPath);
+                await InitFolderAsync(currentPath!);
             }
         }
 
@@ -588,7 +589,8 @@ namespace QR_Code_Tool_App.VievModels
                             {
                                 try
                                 {
-                                    await yandexClient.DeleteFileAsync(currentPath + rowDataDisk.Name);
+                                    if (yandexClient is not null)
+                                        await yandexClient.DeleteFileAsync(currentPath + rowDataDisk.Name);
                                 }
                                 finally
                                 {
@@ -605,22 +607,18 @@ namespace QR_Code_Tool_App.VievModels
                 }
                 finally
                 {
-                    _ = InitFolderAsync(this.currentPath);
+                    _ = InitFolderAsync(this.currentPath!);
                 }
             }
-        }
-
-        private void DeleteCookie()
-        {
-           
-        }
+        }            
 
         private void LogOut()
         {
-            Action logAction = loginWindow.DeleteAllCookies;
+
+            Action logAction = loginWindow!.DeleteAllCookies;
             logAction();
 
-            FolderItems = null;
+            FolderItems = null!;
             currentPath = string.Empty;
             AccessToken = string.Empty;
 
@@ -632,7 +630,7 @@ namespace QR_Code_Tool_App.VievModels
         private void LogIn()
         {
             AccessToken = string.Empty;
-            FolderItems = null;
+            FolderItems = null!;
             currentPath = string.Empty;
             OnPropertyChanged("IsLoggedIn");
             ShowLoginWindow(Client_ID, Return_URL);
@@ -678,7 +676,7 @@ namespace QR_Code_Tool_App.VievModels
         private void ShowLoginWindow(string client_ID, string return_URL)
         {
             loginWindow = new LoginWindow(client_ID, return_URL);
-            loginWindow.AuthCompleted += OnAuthorizeCompleted;
+            loginWindow.AuthCompleted += OnAuthorizeCompleted!;
             loginWindow.ShowDialog();
         }
 
@@ -720,9 +718,9 @@ namespace QR_Code_Tool_App.VievModels
             }
         }
 
-        public ObservableCollection<Resource>? FolderItems
+        public ObservableCollection<Resource> FolderItems
         {
-            get { return folderItems; }
+            get { return folderItems!; }
             set
             {
                 folderItems = value;

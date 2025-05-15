@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using QR_Code_Tool_App.Proveder;
 using QR_Code_Tool_App.SDK;
@@ -13,11 +14,11 @@ namespace QR_Code_Tool_App
     /// </summary>
     public partial class LoginWindow : Window
     {
-        private static string retUrl;
+        private static string? retUrl;
         private readonly WebView2 browser;
-        private static EventHandler<GenericSdkEventArgs<string>> completeHandler;
+        private static EventHandler<GenericSdkEventArgs<string>>? completeHandler;
 
-        private ICommand _clickClose;
+        private ICommand? _clickClose;
         public ICommand ClickClose
         {
             get
@@ -31,11 +32,12 @@ namespace QR_Code_Tool_App
         public LoginWindow()
         {
             InitializeComponent();
-            InitializeWebView();
+            InitializeWebView2Async();
             DataContext = this;
             browser = webView;
         }
 
+       
         public LoginWindow(string clientID, string returnURL) : this()
         {
             AuthorizeAsync(new WebBrowserWrapper(browser), clientID, returnURL, this.CompleteCallback);
@@ -62,20 +64,23 @@ namespace QR_Code_Tool_App
 
         private void BrowserOnNavigating(object? sender, GenericSdkEventArgs<string> e)
         {
-            if (e.Result.Contains(retUrl))
+            if (e.Result.Contains(retUrl!))
             {
                 var token = ResponseParser.ParseToken(e.Result);
-                completeHandler.SafeInvoke(sender!, new GenericSdkEventArgs<string>(token));
+                completeHandler?.SafeInvoke(sender!, new GenericSdkEventArgs<string>(token));
             }
         }
 
-        private async void InitializeWebView()
+        private async void InitializeWebView2Async()
         {
             try
             {
-                // Инициализация среды
-                await webView.EnsureCoreWebView2Async();
+                // Указываем папку для данных (если нужно)
+                var env = await CoreWebView2Environment.CreateAsync(
+                    userDataFolder: @"C:\Temp\WebView2_Data");
 
+                // Инициализация среды
+                await webView.EnsureCoreWebView2Async(env);
                 // Настройка параметров
                 webView.CoreWebView2.Settings.IsZoomControlEnabled = false;
             }
@@ -101,7 +106,7 @@ namespace QR_Code_Tool_App
             this.Close();
         }
 
-        public event EventHandler<GenericSdkEventArgs<string>> AuthCompleted;
+        public event EventHandler<GenericSdkEventArgs<string>>? AuthCompleted;
 
     }
 }

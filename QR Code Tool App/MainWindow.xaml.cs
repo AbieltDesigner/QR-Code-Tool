@@ -1,10 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using QR_Code_Tool_App.Service;
+using QR_Code_Tool_App.VievModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using QR_Code_Tool_App.Service;
-using QR_Code_Tool_App.VievModels;
-using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool_App
 {
@@ -12,8 +10,7 @@ namespace QR_Code_Tool_App
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-        private readonly ICollection<Resource> selectedItems = new Collection<Resource>();
+    {       
         private readonly IMainViewModel mainViewModel;
         public MainWindow()
         {

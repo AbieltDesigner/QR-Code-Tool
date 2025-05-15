@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_EA57BCAFF1A74BCFA95357C2A02299D0"
+        "MsmKey" = "8:_D8198A1DFE874B69893618D07DDCA5B1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -43,6 +43,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +67,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.8.0.x64"
+                    {
+                    "Name" = "8:Среда выполнения .NET 8.0.13 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.8.0.x64"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -90,12 +114,12 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EA57BCAFF1A74BCFA95357C2A02299D0"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D8198A1DFE874B69893618D07DDCA5B1"
             {
             "SourcePath" = "8:..\\QR Code Tool App\\AbieltLogo.ico"
             "TargetName" = "8:AbieltLogo.ico"
             "Tag" = "8:"
-            "Folder" = "8:_10277B0B99734956964992E888FA552E"
+            "Folder" = "8:_8B1441B88FF54CB7BFA0AA31A8D4D27A"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -165,9 +189,9 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Setup QR Code Tool"
+        "ProductName" = "8:QR Code Tool"
         "ProductCode" = "8:{3E8B635E-58DA-4BCE-9DF4-8AB06ECAFC72}"
-        "PackageCode" = "8:{0A0EA05A-7F84-408A-8C7A-0F0174CC5D67}"
+        "PackageCode" = "8:{98FF0A72-AF8C-4E6C-8739-BE864C040D74}"
         "UpgradeCode" = "8:{8B50BFDC-D1DF-417F-8363-45B8722CC23E}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -175,10 +199,10 @@
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Abielt co. LTD"
-        "ARPHELPTELEPHONE" = "8:8(929)618-89-09"
+        "Manufacturer" = "8:Abielt LLC"
+        "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Setup QR Code Tool"
+        "Title" = "8:QR Code Tool"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Chepurin Vladislav"
         "Keywords" = "8:"
@@ -287,18 +311,18 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6C748211026243458361994F652F1E79"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_95B3F6C3777B472B888D9CF82C422444"
             {
-            "Name" = "8:QR Code Tool"
+            "Name" = "8:QRCodeTool"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_10277B0B99734956964992E888FA552E"
+            "Target" = "8:_6492A46E1D994E2ABBF6764030C470AA"
             "Folder" = "8:_10277B0B99734956964992E888FA552E"
-            "WorkingFolder" = "8:_10277B0B99734956964992E888FA552E"
-            "Icon" = "8:_EA57BCAFF1A74BCFA95357C2A02299D0"
+            "WorkingFolder" = "8:_8B1441B88FF54CB7BFA0AA31A8D4D27A"
+            "Icon" = "8:_D8198A1DFE874B69893618D07DDCA5B1"
             "Feature" = "8:"
             }
         }
@@ -702,7 +726,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6492A46E1D994E2ABBF6764030C470AA"
             {
-            "SourcePath" = "8:..\\QR Code Tool App\\obj\\Debug\\net8.0-windows7.0\\apphost.exe"
+            "SourcePath" = "8:..\\QR Code Tool App\\obj\\Release\\net8.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8B1441B88FF54CB7BFA0AA31A8D4D27A"
