@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
@@ -75,9 +76,9 @@ namespace QR_Code_Tool_App
         {
             try
             {
-                // Указываем папку для данных (если нужно)
+                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"QR Code Tool");
                 var env = await CoreWebView2Environment.CreateAsync(
-                    userDataFolder: @"C:\Temp\WebView2_Data");
+                    userDataFolder: path);
 
                 // Инициализация среды
                 await webView.EnsureCoreWebView2Async(env);

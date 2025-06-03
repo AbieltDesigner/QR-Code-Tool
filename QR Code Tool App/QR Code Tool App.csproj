@@ -10,10 +10,19 @@
     <UseWindowsForms>False</UseWindowsForms>
     <ApplicationIcon>AbieltLogo.ico</ApplicationIcon>
     <NuGetAuditMode>all</NuGetAuditMode>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Config\appSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="AbieltLogo.ico" />
+    <Content Include="Config\appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -67,12 +76,6 @@
       <LastGenOutput>WebdavResources.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Config\appSettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

@@ -50,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -190,15 +198,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:QR Code Tool"
-        "ProductCode" = "8:{3E8B635E-58DA-4BCE-9DF4-8AB06ECAFC72}"
-        "PackageCode" = "8:{98FF0A72-AF8C-4E6C-8739-BE864C040D74}"
+        "ProductCode" = "8:{1D0A236D-4A7C-416D-A813-5452C791902A}"
+        "PackageCode" = "8:{2D462159-4833-4BEB-9604-062BD40367CD}"
         "UpgradeCode" = "8:{8B50BFDC-D1DF-417F-8363-45B8722CC23E}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:Abielt LLC"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
