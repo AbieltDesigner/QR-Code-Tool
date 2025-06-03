@@ -4,6 +4,7 @@
         xmlns:converters="clr-namespace:QR_Code_Tool_App.Converters"
         xmlns:av="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="av"
         x:Class="QR_Code_Tool_App.MainWindow"        
         Title="Программа формирования кодов QR" Height="600" Width="1000" 
@@ -36,10 +37,15 @@
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" Style="{StaticResource dataGridStyle}"
                   CanUserAddRows="False" IsReadOnly="True" SelectionChanged="gridItems_SelectionChanged">
-            <DataGrid.Resources>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <EventSetter Event="Control.MouseDoubleClick" Handler="Row_DoubleClick"/>
-                </Style>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding RowDoubleClickCommand}"
+                                  CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            
+            <DataGrid.Resources>      
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}"/>
                 <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="{x:Type DataGridCell}"/>
                 <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}"/>

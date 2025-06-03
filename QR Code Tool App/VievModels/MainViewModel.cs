@@ -18,7 +18,7 @@ using YandexDisk.Client.Protocol;
 
 namespace QR_Code_Tool_App.VievModels
 {
-    public class MainViewModel : INotifyPropertyChanged, IMainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
         private IYandexAPI? yandexClient;
         private LoginWindow? loginWindow;
@@ -51,7 +51,7 @@ namespace QR_Code_Tool_App.VievModels
         private ICommand? _clickLogOut;
         private ICommand? _clickLogIn;
         private ICommand? _clickClose;
-        private ICommand? _pressEnter;
+        private ICommand? _rowDoubleClickCommand;
         public ICommand CloseCommand { get; }
 
         public ICommand ClickBack
@@ -180,12 +180,11 @@ namespace QR_Code_Tool_App.VievModels
                 CloseApp());
             }
         }
-
-        public ICommand PressEnter
+        public ICommand RowDoubleClickCommand
         {
             get
             {
-                return _pressEnter ??= new CommandHandler(
+                return _rowDoubleClickCommand ??= new CommandHandler(
                 () =>
                 Row_DoubleClick());
             }
@@ -624,15 +623,15 @@ namespace QR_Code_Tool_App.VievModels
 
             currentPath = string.Empty;
             AccessToken = string.Empty;
-            OnPropertyChanged("IsLoggedIn");
-            OnPropertyChanged("IsLoggedOut");
+            OnPropertyChanged(nameof(IsLoggedIn));
+            OnPropertyChanged(nameof(IsLoggedOut));
         }
         private void LogIn()
         {
             AccessToken = string.Empty;
             FolderItems = null!;
             currentPath = string.Empty;
-            OnPropertyChanged("IsLoggedIn");
+            OnPropertyChanged(nameof(IsLoggedIn));
             ShowLoginWindow(Client_ID, Return_URL);
         }
 

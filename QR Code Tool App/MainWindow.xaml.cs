@@ -2,7 +2,6 @@
 using QR_Code_Tool_App.VievModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace QR_Code_Tool_App
 {
@@ -11,7 +10,7 @@ namespace QR_Code_Tool_App
     /// </summary>
     public partial class MainWindow : Window
     {       
-        private readonly IMainViewModel mainViewModel;
+        private readonly MainViewModel mainViewModel;
         public MainWindow()
         {
             InitializeComponent();
@@ -19,14 +18,11 @@ namespace QR_Code_Tool_App
             mainViewModel = new MainViewModel(Dispatcher, service);
             DataContext = mainViewModel;
         }
+
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             mainViewModel.GridItems_SelectionChanged(e);
-        }
-
-        private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            mainViewModel.Row_DoubleClick();
-        }
+        } 
+        
     }
 }
