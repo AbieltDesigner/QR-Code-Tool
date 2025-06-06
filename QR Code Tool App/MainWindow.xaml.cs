@@ -1,7 +1,6 @@
-﻿using QR_Code_Tool_App.Service;
+﻿using System.Windows;
+using QR_Code_Tool_App.Service;
 using QR_Code_Tool_App.VievModels;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace QR_Code_Tool_App
 {
@@ -17,11 +16,6 @@ namespace QR_Code_Tool_App
             var service = new WindowService(this);
             mainViewModel = new MainViewModel(Dispatcher, service);
             DataContext = mainViewModel;
-        }
-
-        private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            mainViewModel.GridItems_SelectionChanged(e);
-        }          
+        }             
     }
 }

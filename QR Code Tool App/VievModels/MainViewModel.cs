@@ -1,8 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Win32;
@@ -26,7 +26,7 @@ namespace QR_Code_Tool_App.VievModels
         private Visibility isProressVisibility;
         private string? currentPath, previousPath;
         private readonly string homePath;
-        private readonly ICollection<Resource> selectedItems = [];
+        public ObservableCollection<Resource> SelectedItemsInVM { get; } = [];
         private readonly SemaphoreSlim semaphoreSlim = new(1, 3);
         private readonly string jsonFilePath;
         private readonly AppSettingsDeserialize appSettingsDeserialize;
@@ -55,6 +55,7 @@ namespace QR_Code_Tool_App.VievModels
         public ICommand CloseCommand { get; }
         public ICommand PreviewKeyDownCommand { get; }
         public ICommand RowDoubleClickCommand { get; }
+
 
         public ICommand ClickBack
         {
@@ -98,7 +99,7 @@ namespace QR_Code_Tool_App.VievModels
             {
                 return _clickPrintQR ??= new CommandHandler(
                 () =>
-                PrintQR());
+                PrintQR(SelectedItemsInVM.AsEnumerable()));
             }
         }
         public ICommand ClickPublish
@@ -107,7 +108,7 @@ namespace QR_Code_Tool_App.VievModels
             {
                 return _clickPublish ??= new CommandHandler(
                 async () =>
-                await PublishAsync(selectedItems.AsEnumerable()));
+                await PublishAsync(SelectedItemsInVM.AsEnumerable()));
             }
         }
         public ICommand ClickUnPublish
@@ -116,7 +117,7 @@ namespace QR_Code_Tool_App.VievModels
             {
                 return _clickUnPublish ??= new CommandHandler(
                 async () =>
-                await UnPublishAsync(selectedItems.AsEnumerable()));
+                await UnPublishAsync(SelectedItemsInVM.AsEnumerable()));
             }
         }
         public ICommand ClickCopiLink
@@ -125,7 +126,7 @@ namespace QR_Code_Tool_App.VievModels
             {
                 return _clickCopiLink ??= new CommandHandler(
                 () =>
-                CopiLink());
+                CopiLink(SelectedItemsInVM.AsEnumerable()));
             }
         }
         public ICommand ClickUpLoadFile
@@ -152,7 +153,7 @@ namespace QR_Code_Tool_App.VievModels
             {
                 return _clickDeleteFile ??= new CommandHandler(
                 async () =>
-                await DeleteFileAsync());
+                await DeleteFileAsync(SelectedItemsInVM.AsEnumerable()));
             }
         }
         public ICommand ClickLogOut
@@ -181,15 +182,15 @@ namespace QR_Code_Tool_App.VievModels
                 () =>
                 CloseApp());
             }
-        }         
-
+        }           
+               
         public MainViewModel(Dispatcher dispatcher, IWindowService windowService)
         {
             this.dispatcher = dispatcher;
             _windowService = windowService;
             CloseCommand = new CommandHandler(() => _windowService.Close());
-            PreviewKeyDownCommand = new CommandHandler(() => Row_OpenFolder());
-            RowDoubleClickCommand = new CommandHandler(() => Row_OpenFolder());
+            PreviewKeyDownCommand = new CommandHandler(() => Row_OpenFolder(SelectedItemsInVM.AsEnumerable()));
+            RowDoubleClickCommand = new CommandHandler(() => Row_OpenFolder(SelectedItemsInVM.AsEnumerable()));
 
             jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             appSettingsDeserialize = new AppSettingsDeserialize(jsonFilePath);
@@ -240,9 +241,9 @@ namespace QR_Code_Tool_App.VievModels
         {
             await InitFolderAsync(currentPath!);
         }
-        private void PrintQR()
+        private void PrintQR(IEnumerable<Resource> collectionRows)
         {
-            var printZPL = new PrintZPL(selectedItems.AsEnumerable(), appSettings.PrintSettings);
+            var printZPL = new PrintZPL(collectionRows, appSettings.PrintSettings);
             printZPL.Print();
         }
 
@@ -327,11 +328,11 @@ namespace QR_Code_Tool_App.VievModels
             }
         }
         //Review OK
-        private void CopiLink()
+        private void CopiLink(IEnumerable<Resource> collectionRows)
         {
             try
             {
-                var rowDataDisk = selectedItems.FirstOrDefault();
+                var rowDataDisk = collectionRows.FirstOrDefault();
                 if (rowDataDisk == null)
                     return;
                 if (rowDataDisk.PublicUrl == null)
@@ -557,7 +558,7 @@ namespace QR_Code_Tool_App.VievModels
             }
         }
 
-        private async Task DeleteFileAsync()
+        private async Task DeleteFileAsync(IEnumerable<Resource> collectionRows)
         {
             MessageBoxResult result = MessageBox.Show(
                 "Удалить выбранные файлы?",
@@ -568,8 +569,7 @@ namespace QR_Code_Tool_App.VievModels
             {
                 var currentPath = this.currentPath;
                 try
-                {
-                    var collectionRows = selectedItems.AsEnumerable();
+                {                    
                     ChangeVisibilityOfProgressBar(Visibility.Visible);
                     var tasks = new List<Task>();
 
@@ -633,32 +633,11 @@ namespace QR_Code_Tool_App.VievModels
         private void CloseApp()
         {
             CloseCommand.Execute(this);
-        }
+        }       
 
-        public void GridItems_SelectionChanged(SelectionChangedEventArgs e)
+        public void Row_OpenFolder(IEnumerable<Resource> collectionRows)
         {
-            if (e.AddedItems.Count > 0)
-            {
-                var items = e.AddedItems.Cast<Resource>();
-                foreach (var item in items)
-                {
-                    selectedItems.Add(item);
-                }
-            }
-
-            if (e.RemovedItems.Count > 0)
-            {
-                var items = e.RemovedItems.Cast<Resource>();
-                foreach (var item in items)
-                {
-                    selectedItems.Remove(item);
-                }
-            }
-        }
-
-        public void Row_OpenFolder()
-        {
-            var rowDataDisk = selectedItems.FirstOrDefault();
+            var rowDataDisk = collectionRows.FirstOrDefault();
             if (rowDataDisk?.Type is ResourceType.Dir)
             {
                 previousPath = currentPath;

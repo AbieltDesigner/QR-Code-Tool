@@ -38,13 +38,15 @@
         </StackPanel>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding FolderItems}" AutoGenerateColumns="False" Style="{StaticResource dataGridStyle}"
-                  CanUserAddRows="False" IsReadOnly="True" SelectionChanged="gridItems_SelectionChanged">
+                  CanUserAddRows="False" IsReadOnly="True">
         
             <i:Interaction.Behaviors>
                 <local:DataGridEnterKeyBehavior Command="{Binding PreviewKeyDownCommand}"/>
                 <local:DataGridRowDoubleClickBehavior Command="{Binding RowDoubleClickCommand}"/>
+                <local:DataGridSelectedItemsBehavior SelectedItems= "{Binding SelectedItemsInVM}"/>
             </i:Interaction.Behaviors>
-
+                     
+            
             <DataGrid.Resources>      
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}"/>
                 <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="{x:Type DataGridCell}"/>
