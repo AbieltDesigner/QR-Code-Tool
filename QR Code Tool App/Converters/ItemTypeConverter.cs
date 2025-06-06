@@ -1,8 +1,7 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace QR_Code_Tool.Converters
+namespace QR_Code_Tool_App.Converters
 {
     public class ItemTypeConverter : IValueConverter
     {

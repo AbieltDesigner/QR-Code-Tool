@@ -1,38 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using BinaryKits.Zpl.Label;
 using BinaryKits.Zpl.Label.Elements;
-using QR_Code_Tool.Serializable.Entity;
+using QR_Code_Tool_App.Serializable.Entity;
 using YandexDisk.Client.Protocol;
 
-namespace QR_Code_Tool.Metods
+namespace QR_Code_Tool_App.Metods
 {
     public class PrintZPL
     {
         // WinAPI методы для работы с принтером
         [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool OpenPrinter(string printerName, out IntPtr phPrinter, IntPtr pd);
+        private static extern bool OpenPrinter(string printerName, out nint phPrinter, nint pd);
 
         [DllImport("winspool.drv", SetLastError = true)]
-        private static extern bool ClosePrinter(IntPtr hPrinter);
+        private static extern bool ClosePrinter(nint hPrinter);
 
         [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool StartDocPrinter(IntPtr hPrinter, int level, ref DOCINFO di);
+        private static extern bool StartDocPrinter(nint hPrinter, int level, ref DOCINFO di);
 
         [DllImport("winspool.drv", SetLastError = true)]
-        private static extern bool EndDocPrinter(IntPtr hPrinter);
+        private static extern bool EndDocPrinter(nint hPrinter);
 
         [DllImport("winspool.drv", SetLastError = true)]
-        private static extern bool StartPagePrinter(IntPtr hPrinter);
+        private static extern bool StartPagePrinter(nint hPrinter);
 
         [DllImport("winspool.drv", SetLastError = true)]
-        private static extern bool EndPagePrinter(IntPtr hPrinter);
+        private static extern bool EndPagePrinter(nint hPrinter);
 
         [DllImport("winspool.drv", SetLastError = true)]
-        private static extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, int dwCount, out int dwWritten);
+        private static extern bool WritePrinter(nint hPrinter, nint pBytes, int dwCount, out int dwWritten);
 
         // Структура для документа
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -88,7 +86,7 @@ namespace QR_Code_Tool.Metods
 
         private static void SendToPrinter(string printerName, string zplData)
         {
-            IntPtr hPrinter = IntPtr.Zero;
+            nint hPrinter = nint.Zero;
             DOCINFO di = new DOCINFO
             {
                 pDocName = "ZPL Print Job",
@@ -98,7 +96,7 @@ namespace QR_Code_Tool.Metods
             try
             {
                 // Открываем принтер
-                if (!OpenPrinter(printerName, out hPrinter, IntPtr.Zero))
+                if (!OpenPrinter(printerName, out hPrinter, nint.Zero))
                     try
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -122,7 +120,7 @@ namespace QR_Code_Tool.Metods
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(zplData);
 
                 // Выделяем память и копируем данные
-                IntPtr pBytes = Marshal.AllocCoTaskMem(bytes.Length);
+                nint pBytes = Marshal.AllocCoTaskMem(bytes.Length);
                 Marshal.Copy(bytes, 0, pBytes, bytes.Length);
 
                 // Отправляем данные
@@ -136,7 +134,7 @@ namespace QR_Code_Tool.Metods
             }
             finally
             {
-                if (hPrinter != IntPtr.Zero)
+                if (hPrinter != nint.Zero)
                     ClosePrinter(hPrinter);
             }
         }

@@ -37,7 +37,7 @@ namespace QR_Code_Tool
             GeckoWebBrowser browser = new GeckoWebBrowser();
             host.Child = browser;
             this.browser = browser;
-            GridWeb.Children.Add(host);        
+            GridWeb.Children.Add(host);
             DataContext = this;
         }
 

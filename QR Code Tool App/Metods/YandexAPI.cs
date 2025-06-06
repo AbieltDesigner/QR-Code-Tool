@@ -1,11 +1,9 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
-using QR_Code_Tool.Metods;
 using YandexDisk.Client.Clients;
 using YandexDisk.Client.Http;
 using YandexDisk.Client.Protocol;
 
-namespace QR_Code_Tool.API
+namespace QR_Code_Tool_App.Metods
 {
     public class YandexAPI : IYandexAPI
     {
@@ -25,7 +23,7 @@ namespace QR_Code_Tool.API
         /// <value>The access token.</value>
         public string AccessToken
         {
-            get { return this.accessToken; }
+            get { return accessToken; }
         }
 
         public async Task<Resource> GetListFilesToFolderAsync(string currentPath)
@@ -53,7 +51,7 @@ namespace QR_Code_Tool.API
         public async Task DeleteFileAsync(string filePath)
         {
             var deleteFileRequest = new DeleteFileRequest()
-            { Path = (filePath), Permanently = false };
+            { Path = filePath, Permanently = false };
             await diskHttpApi.Commands.DeleteAsync(deleteFileRequest);
         }
 

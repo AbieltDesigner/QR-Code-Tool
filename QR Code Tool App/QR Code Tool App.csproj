@@ -1,0 +1,81 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <RootNamespace>QR_Code_Tool_App</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>False</UseWindowsForms>
+    <ApplicationIcon>AbieltLogo.ico</ApplicationIcon>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Config\appSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="AbieltLogo.ico" />
+    <Content Include="Config\appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BinaryKits.Zpl.Label" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3240.44" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="YandexDisk.Client" Version="1.3.27" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.WebView2.Wpf">
+      <HintPath>..\..\..\..\.nuget\packages\microsoft.web.webview2\1.0.3240.44\lib_manual\net5.0-windows10.0.17763.0\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="AbieltLogo.ico" />
+    <Resource Include="Resources\AbieltLogo.png" />
+    <Resource Include="Resources\gui_back.png" />
+    <Resource Include="Resources\gui_back_isDisabled.png" />
+    <Resource Include="Resources\gui_back_isEnabled.png" />
+    <Resource Include="Resources\gui_back_isMouseOver.png" />
+    <Resource Include="Resources\gui_home.png" />
+    <Resource Include="Resources\gui_home_isDisabled.png" />
+    <Resource Include="Resources\gui_home_isEnabled.png" />
+    <Resource Include="Resources\gui_home_isMouseOver.png" />
+    <Resource Include="Resources\gui_refresh.png" />
+    <Resource Include="Resources\gui_refresh_isDisabled.png" />
+    <Resource Include="Resources\gui_refresh_isEnabled.png" />
+    <Resource Include="Resources\gui_refresh_isMouseOver.png" />
+    <Resource Include="Resources\gui_up.png" />
+    <Resource Include="Resources\gui_up_isDisabled.png" />
+    <Resource Include="Resources\gui_up_isEnabled.png" />
+    <Resource Include="Resources\gui_up_isMouseOver.png" />
+    <Resource Include="Resources\QRCode.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="SDK\Utils\WebdavResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebdavResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="SDK\Utils\WebdavResources.resx">
+      <LastGenOutput>WebdavResources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
