@@ -22,7 +22,6 @@ namespace QR_Code_Tool_App
         private void gridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             mainViewModel.GridItems_SelectionChanged(e);
-        } 
-        
+        }          
     }
 }

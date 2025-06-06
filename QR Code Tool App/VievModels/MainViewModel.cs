@@ -50,9 +50,11 @@ namespace QR_Code_Tool_App.VievModels
         private ICommand? _clickDeleteFile;
         private ICommand? _clickLogOut;
         private ICommand? _clickLogIn;
-        private ICommand? _clickClose;
-        private ICommand? _rowDoubleClickCommand;
+        private ICommand? _clickClose;   
+        
         public ICommand CloseCommand { get; }
+        public ICommand PreviewKeyDownCommand { get; }
+        public ICommand RowDoubleClickCommand { get; }
 
         public ICommand ClickBack
         {
@@ -179,22 +181,15 @@ namespace QR_Code_Tool_App.VievModels
                 () =>
                 CloseApp());
             }
-        }
-        public ICommand RowDoubleClickCommand
-        {
-            get
-            {
-                return _rowDoubleClickCommand ??= new CommandHandler(
-                () =>
-                Row_DoubleClick());
-            }
-        }
+        }         
 
         public MainViewModel(Dispatcher dispatcher, IWindowService windowService)
         {
             this.dispatcher = dispatcher;
             _windowService = windowService;
             CloseCommand = new CommandHandler(() => _windowService.Close());
+            PreviewKeyDownCommand = new CommandHandler(() => Row_OpenFolder());
+            RowDoubleClickCommand = new CommandHandler(() => Row_OpenFolder());
 
             jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config/appSettings.json");
             appSettingsDeserialize = new AppSettingsDeserialize(jsonFilePath);
@@ -661,7 +656,7 @@ namespace QR_Code_Tool_App.VievModels
             }
         }
 
-        public void Row_DoubleClick()
+        public void Row_OpenFolder()
         {
             var rowDataDisk = selectedItems.FirstOrDefault();
             if (rowDataDisk?.Type is ResourceType.Dir)
@@ -761,8 +756,7 @@ namespace QR_Code_Tool_App.VievModels
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            PropertyChangedEventHandler handler = PropertyChanged!;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged!?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

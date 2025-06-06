@@ -7,7 +7,7 @@ namespace QR_Code_Tool_App.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return int.Parse(value.ToString()) == 0 ? "-" : value;
+            return int.Parse(value.ToString()!) == 0 ? "-" : value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
